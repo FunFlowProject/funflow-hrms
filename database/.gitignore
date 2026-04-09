@@ -1,2 +1,2 @@
 *.sqlite*
-/database/seeders/UserAndAssignmentSeeder.php
+seeders/UserAndAssignmentSeeder.php
