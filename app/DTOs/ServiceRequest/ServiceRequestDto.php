@@ -60,15 +60,15 @@ class ServiceRequestDto
             : $serviceRequest->handler()->value('full_name');
 
         return new self(
-            id: $serviceRequest->id,
-            service_catalog_item_id: $serviceRequest->service_catalog_item_id,
+            id: (int) $serviceRequest->id,
+            service_catalog_item_id: $serviceRequest->service_catalog_item_id !== null ? (int) $serviceRequest->service_catalog_item_id : null,
             service_name: $serviceName,
             service_category: $serviceCategory,
             service_requires_justification: $serviceRequiresJustification,
-            requester_id: $serviceRequest->requester_id,
+            requester_id: (int) $serviceRequest->requester_id,
             requester_name: $requesterName,
             requester_email: $requesterEmail,
-            handled_by: $serviceRequest->handled_by,
+            handled_by: $serviceRequest->handled_by !== null ? (int) $serviceRequest->handled_by : null,
             handled_by_name: $handledByName,
             status: $status->value,
             status_label: $status->label(),

@@ -36,8 +36,8 @@ class SquadDto
         $active = ActiveStatus::safeFrom($squad->active) ?? ActiveStatus::INACTIVE;
 
         return new self(
-            id: $squad->id,
-            sub_company_id: $squad->sub_company_id,
+            id: (int) $squad->id,
+            sub_company_id: (int) $squad->sub_company_id,
             sub_company_name: $subCompanyName,
             name: $squad->name,
             active: $active->value,

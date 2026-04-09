@@ -43,7 +43,7 @@ class ServiceCatalogDto
         $requiresJustification = (bool) $serviceCatalogItem->requires_justification;
 
         return new self(
-            id: $serviceCatalogItem->id,
+            id: (int) $serviceCatalogItem->id,
             name: $serviceCatalogItem->name,
             category: $serviceCatalogItem->category,
             description: $serviceCatalogItem->description,
@@ -51,9 +51,9 @@ class ServiceCatalogDto
             requires_justification_label: $requiresJustification ? __('Yes') : __('No'),
             active: $active->value,
             active_label: $active->label(),
-            created_by: $serviceCatalogItem->created_by,
+            created_by: $serviceCatalogItem->created_by !== null ? (int) $serviceCatalogItem->created_by : null,
             created_by_name: $createdByName,
-            updated_by: $serviceCatalogItem->updated_by,
+            updated_by: $serviceCatalogItem->updated_by !== null ? (int) $serviceCatalogItem->updated_by : null,
             updated_by_name: $updatedByName,
             created_at: $serviceCatalogItem->created_at->format('Y-m-d H:i:s'),
             created_at_formatted: $serviceCatalogItem->created_at->format('d M Y, h:i A'),

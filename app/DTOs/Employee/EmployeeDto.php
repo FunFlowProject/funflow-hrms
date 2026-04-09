@@ -41,7 +41,7 @@ class EmployeeDto
             : $user->assignments()->with(['subCompany:id,name', 'squad:id,name', 'hierarchy:id,title,level,type'])->get();
 
         return new self(
-            id: $user->id,
+            id: (int) $user->id,
             full_name: $user->full_name,
             email: $user->email,
             username: $user->username,
@@ -58,25 +58,25 @@ class EmployeeDto
             status_label: $user->status->label(),
             assignments: $assignments
                 ->map(fn (EmployeeAssignment $assignment): array => [
-                    'id' => $assignment->id,
-                    'sub_company_id' => $assignment->sub_company_id,
-                    'squad_id' => $assignment->squad_id,
-                    'hierarchy_id' => $assignment->hierarchy_id,
+                    'id' => (int) $assignment->id,
+                    'sub_company_id' => (int) $assignment->sub_company_id,
+                    'squad_id' => (int) $assignment->squad_id,
+                    'hierarchy_id' => (int) $assignment->hierarchy_id,
                     'sub_company' => $assignment->relationLoaded('subCompany') && $assignment->subCompany
                         ? [
-                            'id' => $assignment->subCompany->id,
+                            'id' => (int) $assignment->subCompany->id,
                             'name' => $assignment->subCompany->name,
                         ]
                         : null,
                     'squad' => $assignment->relationLoaded('squad') && $assignment->squad
                         ? [
-                            'id' => $assignment->squad->id,
+                            'id' => (int) $assignment->squad->id,
                             'name' => $assignment->squad->name,
                         ]
                         : null,
                     'hierarchy' => $assignment->relationLoaded('hierarchy') && $assignment->hierarchy
                         ? [
-                            'id' => $assignment->hierarchy->id,
+                            'id' => (int) $assignment->hierarchy->id,
                             'title' => $assignment->hierarchy->title,
                             'level' => $assignment->hierarchy->level,
                             'type' => $assignment->hierarchy->type,

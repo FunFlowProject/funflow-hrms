@@ -42,7 +42,7 @@ class SubCompanyDto
         $active = ActiveStatus::safeFrom($subCompany->active) ?? ActiveStatus::INACTIVE;
 
         return new self(
-            id: $subCompany->id,
+            id: (int) $subCompany->id,
             name: $subCompany->name,
             description: $subCompany->description,
             active: $active->value,
@@ -54,7 +54,7 @@ class SubCompanyDto
                     $squadActive = ActiveStatus::safeFrom($squad->active) ?? ActiveStatus::INACTIVE;
 
                     return [
-                        'id' => $squad->id,
+                        'id' => (int) $squad->id,
                         'name' => $squad->name,
                         'active' => $squadActive->value,
                         'active_label' => $squadActive->label(),
