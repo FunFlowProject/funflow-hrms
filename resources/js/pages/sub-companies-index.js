@@ -419,9 +419,12 @@ export function initSubCompaniesPage() {
         init() {
             $('#sub-company-form').on('submit', async function submitSubCompanyForm(event) {
                 event.preventDefault();
+
+                const $submitBtn = $(this).find('button[type="submit"]');
                 Utils.clearFormErrors('#sub-company-form-errors');
 
                 const { id, isEdit, payload } = FormManager.getSubmitPayload();
+                Utils.setBtnLoading($submitBtn, true);
 
                 try {
                     const response = isEdit
@@ -439,6 +442,8 @@ export function initSubCompaniesPage() {
                     }
 
                     Utils.showAlert('danger', error.responseJSON?.message ?? TRANSLATION.error.saveSubCompany);
+                } finally {
+                    Utils.setBtnLoading($submitBtn, false);
                 }
             });
         },

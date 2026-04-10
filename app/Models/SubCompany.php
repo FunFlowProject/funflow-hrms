@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\ActiveStatus;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -47,14 +48,16 @@ class SubCompany extends Model
         ];
     }
 
-    public function scopeActive(Builder $query): Builder
+    #[Scope]
+    protected function active(Builder $query): void
     {
-        return $query->where('active', ActiveStatus::ACTIVE->value);
+        $query->where('active', ActiveStatus::ACTIVE->value);
     }
 
-    public function scopeInactive(Builder $query): Builder
+    #[Scope]
+    protected function inactive(Builder $query): void
     {
-        return $query->where('active', ActiveStatus::INACTIVE->value);
+        $query->where('active', ActiveStatus::INACTIVE->value);
     }
 
     /*

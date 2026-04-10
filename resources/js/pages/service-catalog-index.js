@@ -424,9 +424,12 @@ export function initServiceCatalogPage() {
         init() {
             $('#service-catalog-form').on('submit', async function submitServiceCatalogForm(event) {
                 event.preventDefault();
+
+                const $submitBtn = $(this).find('button[type="submit"]');
                 Utils.clearFormErrors('#service-catalog-form-errors');
 
                 const { id, isEdit, payload } = FormManager.getSubmitPayload();
+                Utils.setBtnLoading($submitBtn, true);
 
                 try {
                     const response = isEdit
@@ -444,6 +447,8 @@ export function initServiceCatalogPage() {
                     }
 
                     Utils.showAlert('danger', error.responseJSON?.message ?? TRANSLATION.error.saveService);
+                } finally {
+                    Utils.setBtnLoading($submitBtn, false);
                 }
             });
         },

@@ -47,33 +47,40 @@
                 </select>
             </div>
 
-            <div class="col-12 mt-4">
-                <h6 class="mb-2 fw-bolder text-secondary text-uppercase small tracking-wide">Primary Worker Assignment</h6>
-                <hr class="mt-0 mb-3 border-secondary opacity-25">
-            </div>
+            <div class="col-12 d-none" id="primary-assignment-fields">
+                <div class="col-12 mt-4">
+                    <h6 class="mb-2 fw-bolder text-secondary text-uppercase small tracking-wide">Primary Worker Assignment
+                    </h6>
+                    <hr class="mt-0 mb-3 border-secondary opacity-25">
+                </div>
 
-            <div class="col-md-4 mt-0">
-                <label for="form-sub-company" class="form-label fw-bold text-dark">Sub-Company</label>
-                <select id="form-sub-company" name="assignments[0][sub_company_id]" class="form-select select2-init">
-                    <option value="">Select Sub-Company</option>
-                </select>
-            </div>
-            <div class="col-md-4 mt-0">
-                <label for="form-squad" class="form-label fw-bold text-dark">Squad</label>
-                <select id="form-squad" name="assignments[0][squad_id]" class="form-select select2-init">
-                    <option value="">No Squad</option>
-                </select>
-            </div>
-            <div class="col-md-4 mt-0">
-                <label for="form-hierarchy" class="form-label fw-bold text-dark">Hierarchy</label>
-                <select id="form-hierarchy" name="assignments[0][hierarchy_id]" class="form-select select2-init">
-                    <option value="">Select Hierarchy</option>
-                </select>
+                <div class="row g-3">
+                    <div class="col-md-4 mt-0">
+                        <label for="form-sub-company" class="form-label fw-bold text-dark">Sub-Company</label>
+                        <select id="form-sub-company" name="assignments[0][sub_company_id]"
+                            class="form-select select2-init">
+                            <option value="">Select Sub-Company</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 mt-0">
+                        <label for="form-squad" class="form-label fw-bold text-dark">Squad</label>
+                        <select id="form-squad" name="assignments[0][squad_id]" class="form-select select2-init">
+                            <option value="">No Squad</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 mt-0">
+                        <label for="form-hierarchy" class="form-label fw-bold text-dark">Hierarchy</label>
+                        <select id="form-hierarchy" name="assignments[0][hierarchy_id]" class="form-select select2-init">
+                            <option value="">Select Hierarchy</option>
+                        </select>
+                    </div>
+                </div>
             </div>
 
             <div class="col-12 mt-4">
                 <div class="alert alert-info mb-0">
-                    Username and temporary password are generated automatically by the system and sent to the employee email.
+                    Username and temporary password are generated automatically by the system and sent to the employee
+                    email.
                 </div>
             </div>
         </div>

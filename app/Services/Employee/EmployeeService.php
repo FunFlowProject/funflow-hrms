@@ -41,17 +41,18 @@ class EmployeeService
     public function all(): array
     {
         return Cache::rememberForever(self::CACHE_PREFIX . '.all', function () {
-            return User::orderBy('full_name')
+            return User::employees()
+                ->orderBy('full_name')
                 ->get()
-                ->map(fn (User $user): array => [
-                    'id'          => $user->id,
-                    'full_name'   => $user->full_name,
-                    'email'       => $user->email,
-                    'username'    => $user->username,
+                ->map(fn(User $user): array => [
+                    'id' => $user->id,
+                    'full_name' => $user->full_name,
+                    'email' => $user->email,
+                    'username' => $user->username,
                     'phone_number' => $user->phone_number,
                     'contract_type' => $user->contract_type->value,
-                    'system_role'  => $user->system_role->value,
-                    'status'      => $user->status->value,
+                    'system_role' => $user->system_role->value,
+                    'status' => $user->status->value,
                 ])
                 ->toArray();
         });
@@ -63,18 +64,19 @@ class EmployeeService
     public function active(): array
     {
         return Cache::rememberForever(self::CACHE_PREFIX . '.active', function () {
-            return User::orderBy('full_name')
+            return User::employees()
+                ->orderBy('full_name')
                 ->where('status', EmployeeStatus::Joined->value)
                 ->get()
-                ->map(fn (User $user): array => [
-                    'id'          => $user->id,
-                    'full_name'   => $user->full_name,
-                    'email'       => $user->email,
-                    'username'    => $user->username,
+                ->map(fn(User $user): array => [
+                    'id' => $user->id,
+                    'full_name' => $user->full_name,
+                    'email' => $user->email,
+                    'username' => $user->username,
                     'phone_number' => $user->phone_number,
                     'contract_type' => $user->contract_type->value,
-                    'system_role'  => $user->system_role->value,
-                    'status'      => $user->status->value,
+                    'system_role' => $user->system_role->value,
+                    'status' => $user->status->value,
                 ])
                 ->toArray();
         });
@@ -91,7 +93,7 @@ class EmployeeService
             $joinedValue = EmployeeStatus::Joined->value;
             $terminatedValue = EmployeeStatus::Terminated->value;
 
-            $stats = User::selectRaw("
+            $stats = User::employees()->selectRaw("
                 COUNT(*) as total,
                 SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as pending_count,
                 SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as onboarding_count,
@@ -139,11 +141,11 @@ class EmployeeService
         return Cache::rememberForever(self::CACHE_PREFIX . '.options', function () {
             return [
                 'contractTypes' => array_map(
-                    static fn (ContractType $type): string => $type->value,
+                    static fn(ContractType $type): string => $type->value,
                     ContractType::cases()
                 ),
                 'systemRoles' => array_map(
-                    static fn (SystemRole $role): string => $role->value,
+                    static fn(SystemRole $role): string => $role->value,
                     SystemRole::cases()
                 ),
                 'hierarchies' => Hierarchy::query()
@@ -161,7 +163,8 @@ class EmployeeService
      */
     public function show(int $id): EmployeeDto
     {
-        $user = User::with(['assignments.subCompany:id,name', 'assignments.squad:id,name', 'assignments.hierarchy:id,title,level,type'])
+        $user = User::employees()
+            ->with(['assignments.subCompany:id,name', 'assignments.squad:id,name', 'assignments.hierarchy:id,title,level,type'])
             ->find($id);
 
         if (!$user) {
@@ -178,20 +181,20 @@ class EmployeeService
      */
     public function datatable(): JsonResponse
     {
-        $query = User::query()->with(['assignments.subCompany:id,name', 'assignments.squad:id,name', 'assignments.hierarchy:id,title,level,type']);
+        $query = User::employees()->with(['assignments.subCompany:id,name', 'assignments.squad:id,name', 'assignments.hierarchy:id,title,level,type']);
         $query = $this->applySearchFilters($query);
         $query->orderByDesc('created_at');
 
         return DataTables::of($query)
             ->addIndexColumn()
-            ->addColumn('username', fn (User $user): string => $user->username ?? '-')
-            ->addColumn('email', fn (User $user): string => $user->email)
-            ->addColumn('phone', fn (User $user): string => $user->phone_number ?? '-')
-            ->addColumn('contract_type', fn (User $user): string => $user->contract_type->label())
-            ->addColumn('system_role', fn (User $user): string => $user->system_role->label())
-            ->addColumn('status', fn (User $user): string => $user->status->label())
-            ->addColumn('hire_date', fn (User $user): string => $user->hire_date?->format('d M Y') ?? '-')
-            ->addColumn('actions', fn (User $user): string => $this->renderActionButtons($user))
+            ->addColumn('username', fn(User $user): string => $user->username ?? '-')
+            ->addColumn('email', fn(User $user): string => $user->email)
+            ->addColumn('phone', fn(User $user): string => $user->phone_number ?? '-')
+            ->addColumn('contract_type', fn(User $user): string => $user->contract_type->label())
+            ->addColumn('system_role', fn(User $user): string => $user->system_role->label())
+            ->addColumn('status', fn(User $user): string => $user->status->label())
+            ->addColumn('hire_date', fn(User $user): string => $user->hire_date?->format('d M Y') ?? '-')
+            ->addColumn('actions', fn(User $user): string => $this->renderActionButtons($user))
             ->rawColumns(['actions'])
             ->make(true);
     }
@@ -216,20 +219,22 @@ class EmployeeService
 
         $user = DB::transaction(function () use ($data, $contractType, $status, $systemRole, $creationNote, $plainPassword): User {
             $created = User::query()->create([
-                'full_name'     => $data['full_name'] ?? $data['name'],
-                'email'         => $data['email'],
-                'phone_number'  => $data['phone_number'] ?? $data['phone'] ?? null,
+                'full_name' => $data['full_name'] ?? $data['name'],
+                'email' => $data['email'],
+                'phone_number' => $data['phone_number'] ?? $data['phone'] ?? null,
                 'date_of_birth' => $data['date_of_birth'] ?? null,
-                'hire_date'     => $data['hire_date'] ?? null,
+                'hire_date' => $data['hire_date'] ?? null,
                 'contract_type' => $contractType,
-                'system_role'   => $systemRole,
-                'status'        => $status,
-                'password'      => Hash::make($plainPassword),
+                'system_role' => $systemRole,
+                'status' => $status,
+                'password' => Hash::make($plainPassword),
             ]);
 
             $created->syncRoles([$systemRole->value]);
 
-            $this->syncAssignments($created, $data['assignments'] ?? []);
+            if ($systemRole === SystemRole::Employee) {
+                $this->syncAssignments($created, $data['assignments'] ?? []);
+            }
 
             $this->recordStatusHistory(
                 employee: $created,
@@ -282,7 +287,10 @@ class EmployeeService
                 'system_role' => SystemRole::safeFrom($data['system_role'] ?? null) ?? $user->system_role,
             ];
 
+            $oldRole = $user->system_role;
             $user->update($payload);
+
+            $newRole = $user->system_role;
 
             if (isset($payload['system_role'])) {
                 $role = $payload['system_role'] instanceof SystemRole
@@ -292,7 +300,11 @@ class EmployeeService
                 $user->syncRoles([$role]);
             }
 
-            $this->syncAssignments($user, $data['assignments'] ?? []);
+            if ($user->system_role === SystemRole::Employee) {
+                $this->syncAssignments($user, $data['assignments'] ?? []);
+            } else {
+                $user->assignments()->delete();
+            }
 
             return $user;
         });
@@ -416,12 +428,12 @@ class EmployeeService
         };
 
         return view('components.ui.table-actions', [
-            'mode'          => $mode,
-            'actions'       => $actions,
+            'mode' => $mode,
+            'actions' => $actions,
             'singleActions' => $singleActions,
-            'id'            => $user->id,
-            'type'          => 'Employee',
-            'deleteName'    => $user->full_name,
+            'id' => $user->id,
+            'type' => 'Employee',
+            'deleteName' => $user->full_name,
         ])->render();
     }
 
@@ -447,28 +459,32 @@ class EmployeeService
     protected function buildSingleActions(User $authUser, User $user): array
     {
         return match ($user->status) {
-            EmployeeStatus::Pending => $authUser->hasPermissionTo('employees.move-to-onboarding') ? [[
-                'action' => 'onboard',
-                'label' => 'Start Onboarding',
-                'icon' => 'bx bx-loader-circle',
-                'tone' => 'warning',
-                'show_label' => true,
-                'class' => 'btn-onboard-employee',
-                'data' => [
-                    'name' => $user->full_name,
-                ],
-            ]] : [],
-            EmployeeStatus::Onboarding => $authUser->hasPermissionTo('employees.confirm-join') ? [[
-                'action' => 'join',
-                'label' => 'Confirm Join',
-                'icon' => 'bx bx-user-check',
-                'tone' => 'success',
-                'show_label' => true,
-                'class' => 'btn-join-employee',
-                'data' => [
-                    'name' => $user->full_name,
-                ],
-            ]] : [],
+            EmployeeStatus::Pending => $authUser->hasPermissionTo('employees.move-to-onboarding') ? [
+                [
+                    'action' => 'onboard',
+                    'label' => 'Start Onboarding',
+                    'icon' => 'bx bx-loader-circle',
+                    'tone' => 'warning',
+                    'show_label' => true,
+                    'class' => 'btn-onboard-employee',
+                    'data' => [
+                        'name' => $user->full_name,
+                    ],
+                ]
+            ] : [],
+            EmployeeStatus::Onboarding => $authUser->hasPermissionTo('employees.confirm-join') ? [
+                [
+                    'action' => 'join',
+                    'label' => 'Confirm Join',
+                    'icon' => 'bx bx-user-check',
+                    'tone' => 'success',
+                    'show_label' => true,
+                    'class' => 'btn-join-employee',
+                    'data' => [
+                        'name' => $user->full_name,
+                    ],
+                ]
+            ] : [],
             default => [],
         };
     }
@@ -479,14 +495,13 @@ class EmployeeService
         string $action,
         ?string $note = null,
         array $details = [],
-    ): EmployeeDto
-    {
+    ): EmployeeDto {
         $fromStatus = $user->status;
 
         if ($fromStatus === $newStatus) {
             return EmployeeDto::fromModel(
                 $user->fresh(['assignments.subCompany:id,name', 'assignments.squad:id,name', 'assignments.hierarchy:id,title,level,type'])
-                    ?? $user
+                ?? $user
             );
         }
 
@@ -537,7 +552,7 @@ class EmployeeService
         $contextDetails = array_filter([
             'ip_address' => $request?->ip(),
             'user_agent' => $request?->userAgent(),
-        ], static fn ($value): bool => filled($value));
+        ], static fn($value): bool => filled($value));
 
         $payloadDetails = array_merge($contextDetails, $details);
 
@@ -561,20 +576,21 @@ class EmployeeService
     {
         $preparedAssignments = collect($assignments ?? [])
             ->filter(static function ($assignment): bool {
-                return filled($assignment['sub_company_id'] ?? null)
-                    && filled($assignment['hierarchy_id'] ?? null);
+                return filled($assignment['hierarchy_id'] ?? null);
             })
-            ->map(static function ($assignment): array {
+            ->map(static function ($assignment, $index): array {
                 return [
-                    'sub_company_id' => (int) $assignment['sub_company_id'],
+                    'sub_company_id' => filled($assignment['sub_company_id'] ?? null) ? (int) $assignment['sub_company_id'] : null,
                     'squad_id' => filled($assignment['squad_id'] ?? null) ? (int) $assignment['squad_id'] : null,
                     'hierarchy_id' => (int) $assignment['hierarchy_id'],
+                    'is_primary' => $index === 0,
                 ];
             })
             ->unique(static function (array $assignment): string {
+                $subCompanyId = $assignment['sub_company_id'] ?? 'null';
                 $squadId = $assignment['squad_id'] ?? 'null';
 
-                return $assignment['sub_company_id'] . '|' . $squadId . '|' . $assignment['hierarchy_id'];
+                return $subCompanyId . '|' . $squadId . '|' . $assignment['hierarchy_id'];
             })
             ->values()
             ->all();

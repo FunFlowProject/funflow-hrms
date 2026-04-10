@@ -19,12 +19,26 @@
     @if ($canRenderDropdown)
         <div class="btn-group">
             <button type="button" class="btn btn-primary btn-icon rounded-pill dropdown-toggle hide-arrow"
-                data-bs-toggle="dropdown" aria-expanded="false" aria-label="Actions" title="Actions">
+                data-bs-toggle="dropdown" data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false"
+                aria-label="Actions" title="Actions">
                 <i class="bx bx-dots-vertical-rounded"></i>
             </button>
             <ul class="dropdown-menu dropdown-menu-end">
                 @foreach ($normalizedActions as $actionItem)
-                    @if ($actionItem === 'view')
+                    @if (is_array($actionItem))
+                        <li>
+                            <a class="dropdown-item {{ $actionItem['class'] ?? '' }}"
+                                href="{{ $actionItem['href'] ?? 'javascript:void(0);' }}"
+                                @if (isset($actionItem['modal_target'])) data-bs-target="{{ $actionItem['modal_target'] }}" @endif
+                                @if (isset($actionItem['modal_toggle'])) data-bs-toggle="{{ $actionItem['modal_toggle'] }}" @endif
+                                @if (isset($actionItem['data']) && is_array($actionItem['data'])) @foreach ($actionItem['data'] as $attr => $value) data-{{ $attr }}="{{ $value }}" @endforeach @endif>
+                                @if (isset($actionItem['icon']))
+                                    <i class="{{ $actionItem['icon'] }} me-1"></i>
+                                @endif
+                                {{ __($actionItem['label'] ?? '') }}
+                            </a>
+                        </li>
+                    @elseif ($actionItem === 'view')
                         <li>
                             <a class="dropdown-item btn-view-employee view{{ $typeSuffix }}Btn" href="javascript:void(0);"
                                 @if ($id) data-id="{{ $id }}" @endif data-bs-toggle="modal"

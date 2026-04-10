@@ -22,17 +22,9 @@ class Menu {
 
     el.classList.add('menu-vertical')
 
-    const PerfectScrollbarLib = _PS || window.PerfectScrollbar
-
-    if (PerfectScrollbarLib) {
-      this._scrollbar = new PerfectScrollbarLib(el.querySelector('.menu-inner'), {
-        suppressScrollX: true,
-        wheelPropagation: !Menu._hasClass('layout-menu-fixed layout-menu-fixed-offcanvas')
-      })
-
-      window.Helpers.menuPsScroll = this._scrollbar
-    } else {
-      el.querySelector('.menu-inner').classList.add('overflow-auto')
+    this._scrollbar = null;
+    if (el.querySelector('.menu-inner')) {
+      el.querySelector('.menu-inner').classList.add('overflow-auto');
     }
 
     // Add data attribute for bg color class of menu
@@ -505,31 +497,13 @@ class Menu {
   }
 
   update() {
-    if (this._scrollbar) {
-      this._scrollbar.update()
-    }
+    // Native scroll automatically updates
   }
 
   manageScroll() {
-    const { PerfectScrollbar } = window
-    const menuInner = document.querySelector('.menu-inner')
-
-    if (window.innerWidth < window.Helpers.LAYOUT_BREAKPOINT) {
-      if (this._scrollbar !== null) {
-        // window.Helpers.menuPsScroll.destroy()
-        this._scrollbar.destroy()
-        this._scrollbar = null
-      }
-      menuInner.classList.add('overflow-auto')
-    } else {
-      if (this._scrollbar === null) {
-        const menuScroll = new PerfectScrollbar(document.querySelector('.menu-inner'), {
-          suppressScrollX: true,
-          wheelPropagation: false
-        })
-        this._scrollbar = menuScroll
-      }
-      menuInner.classList.remove('overflow-auto')
+    const menuInner = document.querySelector('.menu-inner');
+    if (menuInner) {
+      menuInner.classList.add('overflow-auto');
     }
   }
 
@@ -575,10 +549,7 @@ class Menu {
     this._onOpened = null
     this._onClose = null
     this._onClosed = null
-    if (this._scrollbar) {
-      this._scrollbar.destroy()
-      this._scrollbar = null
-    }
+    this._scrollbar = null
     this._inner = null
     this._prevBtn = null
     this._wrapper = null

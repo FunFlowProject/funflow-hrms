@@ -25,7 +25,7 @@ class AdminDashboardService
         $joinedValue = EmployeeStatus::Joined->value;
         $terminatedValue = EmployeeStatus::Terminated->value;
 
-        $employeeStats = User::query()
+        $employeeStats = User::employees()
             ->selectRaw('COUNT(*) as total')
             ->selectRaw('SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as pending_count', [$pendingValue])
             ->selectRaw('SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as onboarding_count', [$onboardingValue])

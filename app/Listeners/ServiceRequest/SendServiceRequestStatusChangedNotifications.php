@@ -6,7 +6,7 @@ namespace App\Listeners\ServiceRequest;
 
 use App\Events\ServiceRequest\ServiceRequestStatusChanged;
 use App\Notifications\ServiceRequest\ServiceRequestStatusChangedNotification;
-use App\Services\ServiceRequest\ServiceRequestNotificationRecipientResolver;
+use App\Services\Notification\LeadershipResolver;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Notification;
@@ -21,7 +21,7 @@ class SendServiceRequestStatusChangedNotifications implements ShouldQueue
      * Create the event listener.
      */
     public function __construct(
-        private readonly ServiceRequestNotificationRecipientResolver $recipientResolver,
+        private readonly LeadershipResolver $leadershipResolver,
     ) {}
 
     /**
@@ -29,7 +29,20 @@ class SendServiceRequestStatusChangedNotifications implements ShouldQueue
      */
     public function handle(ServiceRequestStatusChanged $event): void
     {
-        $recipients = $this->recipientResolver->resolveForStatusChange($event->serviceRequest);
+        $serviceRequest = $event->serviceRequest;
+        $actor = $event->actor;
+
+        // 1. Resolve Requester
+        $requester = $serviceRequest->requester;
+
+        // 2. Resolve Leaders of the requester
+        $leaders = $this->leadershipResolver->getLeaders($requester);
+
+        // 3. Combine and filter out the actor
+        $recipients = collect($requester ? [$requester] : [])
+            ->concat($leaders)
+            ->unique('id')
+            ->filter(fn ($user) => $user->id !== $actor?->id);
 
         if ($recipients->isEmpty()) {
             return;
@@ -38,8 +51,8 @@ class SendServiceRequestStatusChangedNotifications implements ShouldQueue
         Notification::send(
             $recipients,
             new ServiceRequestStatusChangedNotification(
-                serviceRequest: $event->serviceRequest,
-                actor: $event->actor,
+                serviceRequest: $serviceRequest,
+                actor: $actor,
                 fromStatus: $event->fromStatus,
                 toStatus: $event->toStatus,
                 action: $event->action,

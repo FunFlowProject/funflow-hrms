@@ -1,8 +1,5 @@
-import PerfectScrollbar from 'perfect-scrollbar';
 import { Helpers } from '../../public/js/helpers';
 import { Menu } from '../../public/js/menu';
-
-let pageScrollbarInstance = null;
 
 function initTooltips() {
     const tooltipNodes = document.querySelectorAll('[data-bs-toggle="tooltip"]');
@@ -36,91 +33,19 @@ function initAccordions() {
 }
 
 function initMenuShadow() {
-    const menuInnerNode = document.querySelector('.menu-inner');
-    const menuShadowNode = document.querySelector('.menu-inner-shadow');
-
-    if (!menuInnerNode || !menuShadowNode) {
-        return;
-    }
-
-    menuInnerNode.addEventListener('ps-scroll-y', function onMenuScroll() {
-        const thumbNode = this.querySelector('.ps__thumb-y');
-
-        if (!thumbNode) {
-            return;
-        }
-
-        menuShadowNode.style.display = thumbNode.offsetTop ? 'block' : 'none';
-    });
+    // Menu shadow is disabled without perfect scrollbar
 }
 
 function calculatePageScrollHeight(pageScrollNode) {
-    const footerNode = document.querySelector('.content-footer');
-    const footerHeight = footerNode ? footerNode.getBoundingClientRect().height : 0;
-    const topOffset = pageScrollNode.getBoundingClientRect().top;
-
-    return Math.max(220, Math.floor(window.innerHeight - topOffset - footerHeight - 12));
+    // Height calculation not needed natively
 }
 
 function syncPageScrollbar() {
-    const pageScrollNode = document.getElementById('layout-page-content');
-
-    if (!pageScrollNode) {
-        return;
-    }
-
-    if (window.Helpers.isSmallScreen()) {
-        pageScrollNode.style.height = '';
-
-        if (pageScrollbarInstance) {
-            pageScrollbarInstance.destroy();
-            pageScrollbarInstance = null;
-        }
-
-        return;
-    }
-
-    pageScrollNode.style.height = `${calculatePageScrollHeight(pageScrollNode)}px`;
-
-    if (!pageScrollbarInstance) {
-        pageScrollbarInstance = new PerfectScrollbar(pageScrollNode, {
-            suppressScrollX: true,
-            wheelPropagation: false,
-        });
-    } else {
-        pageScrollbarInstance.update();
-    }
+    // Native scrollbar requires no syncing
 }
 
 function initPageScrollbar() {
-    const pageScrollNode = document.getElementById('layout-page-content');
-
-    if (!pageScrollNode) {
-        return;
-    }
-
-    const sync = () => {
-        syncPageScrollbar();
-    };
-
-    sync();
-
-    window.Helpers.on('resize.layout:pageScroll', sync);
-    window.Helpers.on('toggle.layout:pageScroll', sync);
-
-    if (typeof window.ResizeObserver === 'function') {
-        const resizeObserver = new window.ResizeObserver(sync);
-        const navbarNode = document.querySelector('.layout-navbar');
-        const footerNode = document.querySelector('.content-footer');
-
-        if (navbarNode) {
-            resizeObserver.observe(navbarNode);
-        }
-
-        if (footerNode) {
-            resizeObserver.observe(footerNode);
-        }
-    }
+    // Native scrolling used
 }
 
 function initMenuTogglers() {
@@ -184,7 +109,6 @@ export function initLayout() {
 
     window.Helpers = Helpers;
     window.Menu = Menu;
-    window.PerfectScrollbar = PerfectScrollbar;
 
     initTemplateMenu();
     initPageScrollbar();

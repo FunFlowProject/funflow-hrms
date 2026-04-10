@@ -25,7 +25,7 @@
                 </div>
             @endif
 
-            <form class="mb-3" action="{{ route('login.attempt') }}" method="POST">
+            <form id="login-form" class="mb-3" action="{{ route('login.attempt') }}" method="POST">
                 @csrf
                 <div class="mb-3">
                     <label for="login" class="form-label">Username or Email</label>
@@ -53,9 +53,20 @@
                 </div>
 
                 <div class="mb-3">
-                    <button class="btn btn-primary d-grid w-100" type="submit">Sign in</button>
+                    <button id="login-submit-btn" class="btn btn-primary d-grid w-100" type="submit">Sign in</button>
                 </div>
             </form>
         </div>
     </div>
+
+    @push('page-js')
+    <script>
+        document.getElementById('login-form').addEventListener('submit', function() {
+            const btn = document.getElementById('login-submit-btn');
+            const originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Processing...';
+        });
+    </script>
+    @endpush
 </x-layouts.auth>

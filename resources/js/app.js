@@ -17,6 +17,10 @@ import { initServiceCatalogPage } from './pages/service-catalog-index';
 import { initServiceRequestsPage } from './pages/service-requests-index';
 import { initSubCompaniesPage } from './pages/sub-companies-index';
 import { initSquadsPage } from './pages/squads-index';
+import { initDocumentsPage } from './pages/documents-index';
+import { initMyDocumentsPage } from './pages/documents-my-documents';
+import { initEducationalObjectivesPage } from './pages/educational-objectives-index';
+import { initMyObjectivesPage } from './pages/educational-objectives-my';
 
 window.bootstrap = bootstrap;
 window.$ = $;
@@ -39,4 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initSquadsPage();
     initServiceCatalogPage();
     initServiceRequestsPage();
+    initDocumentsPage();
+    initMyDocumentsPage();
+    initEducationalObjectivesPage();
+    initMyObjectivesPage();
 });

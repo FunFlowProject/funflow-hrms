@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\ActiveStatus;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -43,6 +44,7 @@ class EmployeeAssignment extends Pivot
         'sub_company_id',
         'squad_id',
         'hierarchy_id',
+        'is_primary',
         'active',
     ];
 
@@ -55,17 +57,20 @@ class EmployeeAssignment extends Pivot
     {
         return [
             'active' => ActiveStatus::class,
+            'is_primary' => 'boolean',
         ];
     }
 
-    public function scopeActive(Builder $query): Builder
+    #[Scope]
+    protected function active(Builder $query): void
     {
-        return $query->where('active', ActiveStatus::ACTIVE->value);
+        $query->where('active', ActiveStatus::ACTIVE->value);
     }
 
-    public function scopeInactive(Builder $query): Builder
+    #[Scope]
+    protected function inactive(Builder $query): void
     {
-        return $query->where('active', ActiveStatus::INACTIVE->value);
+        $query->where('active', ActiveStatus::INACTIVE->value);
     }
 
     /*

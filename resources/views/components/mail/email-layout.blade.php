@@ -28,11 +28,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $subject }}</title>
  </head>
-<body style="margin:0;padding:0;background-color:#f3f5f8;font-family:'Segoe UI',Tahoma,Arial,sans-serif;color:#1f2a37;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f3f5f8;padding:24px 12px;">
+<body style="margin:0;padding:0;background-color:#f8fafc;font-family:'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;color:#1e293b;-webkit-font-smoothing:antialiased;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8fafc;padding:32px 16px;">
     <tr>
         <td align="center">
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:680px;background:#ffffff;border-radius:14px;overflow:hidden;border:1px solid #e5e7eb;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:500px;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);border:1px solid #e2e8f0;">
                 <tr>
                     <td style="padding:0;">
                         <x-mail.email-header
@@ -42,7 +42,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td style="padding:28px 32px 18px;line-height:1.6;font-size:14px;">
+                    <td style="padding:32px 32px 24px;line-height:1.5;font-size:14px;color:#334155;">
                         {{ $slot }}
                     </td>
                 </tr>

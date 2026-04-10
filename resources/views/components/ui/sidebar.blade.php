@@ -20,6 +20,13 @@
             </a>
         </li>
 
+        <li class="menu-item">
+            <a href="https://funflow.org/emp-email-login" target="_blank" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-envelope"></i>
+                <div>Mailbox</div>
+            </a>
+        </li>
+
         @can('employees.view')
             <li class="menu-item {{ request()->routeIs('employees.*') ? 'active' : '' }}">
                 <a href="{{ route('employees.index') }}" class="menu-link">
@@ -80,6 +87,48 @@
                 <a href="{{ route('my-service-requests.index') }}" class="menu-link">
                     <i class="menu-icon tf-icons bx bx-message-dots"></i>
                     <div>My Service Requests</div>
+                </a>
+            </li>
+        @endcan
+
+        <li class="menu-header small text-uppercase">
+            <span class="menu-header-text">Documents</span>
+        </li>
+        @can('documents.view')
+            <li class="menu-item {{ request()->routeIs('documents.*') ? 'active' : '' }}">
+                <a href="{{ route('documents.index') }}" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-file"></i>
+                    <div>Document Management</div>
+                </a>
+            </li>
+        @endcan
+
+        @can('documents.my.view')
+            <li class="menu-item {{ request()->routeIs('my-documents.*') ? 'active' : '' }}">
+                <a href="{{ route('my-documents.index') }}" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-collection"></i>
+                    <div>My Documents</div>
+                </a>
+            </li>
+        @endcan
+
+        <li class="menu-header small text-uppercase">
+            <span class="menu-header-text">Development</span>
+        </li>
+        @canany(['educational-objectives.manage', 'educational-objectives.manage-all'])
+            <li class="menu-item {{ request()->routeIs('educational-objectives.*') ? 'active' : '' }}">
+                <a href="{{ route('educational-objectives.index') }}" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-book-open"></i>
+                    <div>Management</div>
+                </a>
+            </li>
+        @endcanany
+
+        @can('educational-objectives.my.view')
+            <li class="menu-item {{ request()->routeIs('my-objectives.*') ? 'active' : '' }}">
+                <a href="{{ route('my-objectives.index') }}" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-book-bookmark"></i>
+                    <div>My Objectives</div>
                 </a>
             </li>
         @endcan

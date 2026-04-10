@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\ServiceRequestStatus;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -66,33 +67,35 @@ class ServiceRequest extends Model
         ];
     }
 
-    public function scopeMine(Builder $query, int $userId): Builder
+    #[Scope]
+    protected function mine(Builder $query, int $userId): void
     {
-        return $query->where('requester_id', $userId);
+        $query->where('requester_id', $userId);
     }
 
-    public function scopeManageableBy(Builder $query, ?User $user): Builder
+    #[Scope]
+    protected function manageableBy(Builder $query, ?User $user): void
     {
         if (!$user) {
-            return $query->whereRaw('1 = 0');
+            $query->whereRaw('1 = 0');
+            return;
         }
 
         if ($user->can('service-requests.manage')) {
-            return $query;
+            return;
         }
 
-        return $query->where('requester_id', $user->id);
+        $query->where('requester_id', $user->id);
     }
 
-    public function scopeWithStatus(Builder $query, ServiceRequestStatus|string|null $status): Builder
+    #[Scope]
+    protected function withStatus(Builder $query, ServiceRequestStatus|string|null $status): void
     {
         $enum = ServiceRequestStatus::safeFrom($status);
 
-        if (!$enum) {
-            return $query;
+        if ($enum) {
+            $query->where('status', $enum->value);
         }
-
-        return $query->where('status', $enum->value);
     }
 
     /*

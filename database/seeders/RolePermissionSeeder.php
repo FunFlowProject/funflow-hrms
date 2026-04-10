@@ -57,12 +57,29 @@ class RolePermissionSeeder extends Seeder
             'service-requests.transition',
         ];
 
+        $documentPermissions = [
+            'documents.view',
+            'documents.my.view',
+            'documents.create',
+            'documents.update',
+            'documents.destroy',
+        ];
+
+        $educationalPermissions = [
+            'educational-objectives.manage-all',
+            'educational-objectives.manage',
+            'educational-objectives.my.view',
+            'educational-objectives.view',
+        ];
+
         $permissions = array_values(array_unique(array_merge(
             $employeePermissions,
             $subCompanyPermissions,
             $squadPermissions,
             $serviceCatalogPermissions,
             $serviceRequestPermissions,
+            $documentPermissions,
+            $educationalPermissions,
         )));
 
         foreach ($permissions as $permissionName) {
@@ -78,8 +95,8 @@ class RolePermissionSeeder extends Seeder
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         $rolePermissions = [
-            'admin' => $permissions,
-            'hr' => [
+            'admin' => array_values(array_filter($permissions, fn($p) => !str_ends_with($p, '.my.view'))),
+            'hr' => array_values(array_filter([
                 'employees.view',
                 'employees.create',
                 'employees.update',
@@ -94,9 +111,17 @@ class RolePermissionSeeder extends Seeder
                 'squads.view',
                 'squads.create',
                 'squads.update',
-            ],
+                'documents.view',
+                'documents.create',
+                'documents.update',
+                'documents.destroy',
+                'educational-objectives.manage-all', // HR can manage all
+            ], fn($p) => !str_ends_with($p, '.my.view'))),
             'employee' => [
                 'service-requests.view',
+                'documents.my.view',
+                'educational-objectives.my.view',
+                'educational-objectives.view',
             ],
         ];
 

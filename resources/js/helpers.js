@@ -307,6 +307,34 @@ export function setFormLoading(form, isLoading) {
 }
 
 /**
+ * Toggles a loading state on a button.
+ * Disables the button and shows a spinner.
+ *
+ * @param {string|Element} selector
+ * @param {boolean} isLoading
+ * @param {string} loadingText
+ */
+export function setBtnLoading(selector, isLoading, loadingText = 'Processing...') {
+    const btn = typeof selector === 'string' ? document.querySelector(selector) : selector;
+    if (!btn) return;
+
+    if (isLoading) {
+        // Save original HTML if not already saved
+        if (!btn.dataset.originalHtml) {
+            btn.dataset.originalHtml = btn.innerHTML;
+        }
+        btn.disabled = true;
+        btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>${loadingText}`;
+    } else {
+        btn.disabled = false;
+        if (btn.dataset.originalHtml) {
+            btn.innerHTML = btn.dataset.originalHtml;
+            delete btn.dataset.originalHtml;
+        }
+    }
+}
+
+/**
  * Strips entries from a jQuery serializeArray() payload whose `name`
  * starts with any of the given prefixes.
  *
@@ -466,29 +494,15 @@ export function createModalManager() {
     const instances = new Map();
 
     const init = (modalNode, psOptions = {}) => {
-        if (!window.PerfectScrollbar || instances.has(modalNode)) return;
-
-        const body = modalNode.querySelector('.modal-body');
-        if (!body) return;
-
-        const ps = new window.PerfectScrollbar(body, {
-            suppressScrollX: true,
-            wheelPropagation: false,
-            ...psOptions,
-        });
-
-        instances.set(modalNode, ps);
+        // perfect-scrollbar removed, using native bootstrap scrolling
     };
 
     const update = (modalNode) => {
-        instances.get(modalNode)?.update();
+        // no-op
     };
 
     const destroy = (modalNode) => {
-        const ps = instances.get(modalNode);
-        if (!ps) return;
-        ps.destroy();
-        instances.delete(modalNode);
+        // no-op
     };
 
     const hideModal = (modalNode) => {

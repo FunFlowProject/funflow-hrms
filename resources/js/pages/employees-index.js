@@ -377,6 +377,18 @@ export function initEmployeesPage() {
 
             OptionsManager.clearSquadOptions();
             Utils.clearFormErrors('#employee-form-errors');
+            this.toggleAssignmentSection();
+        },
+
+        toggleAssignmentSection() {
+            const role = String($('#form-system-role').val() ?? '').toLowerCase().trim();
+            const $section = $('#primary-assignment-fields');
+
+            if (role === 'employee') {
+                $section.removeClass('d-none');
+            } else {
+                $section.addClass('d-none');
+            }
         },
 
         async populate(employee) {
@@ -395,6 +407,8 @@ export function initEmployeesPage() {
 
             $('#form-contract-type').val(employee.contract_type ?? 'full-time').trigger('change.select2');
             $('#form-system-role').val(employee.system_role ?? 'employee').trigger('change.select2');
+
+            this.toggleAssignmentSection();
 
             const assignment = (employee.employee_assignments ?? employee.assignments ?? [])[0];
 
@@ -728,6 +742,8 @@ export function initEmployeesPage() {
         init() {
             $('#employee-form').on('submit', async function submitEmployeeForm(event) {
                 event.preventDefault();
+
+                const $submitBtn = $(this).find('button[type="submit"]');
                 Utils.clearFormErrors('#employee-form-errors');
 
                 if (!FormManager.validateAssignmentPair()) {
@@ -735,6 +751,7 @@ export function initEmployeesPage() {
                 }
 
                 const { id, isEdit, payload } = FormManager.getSubmitPayload();
+                Utils.setBtnLoading($submitBtn, true);
 
                 try {
                     const response = isEdit
@@ -752,6 +769,8 @@ export function initEmployeesPage() {
                     }
 
                     Utils.showAlert('danger', error.responseJSON?.message ?? TRANSLATION.error.saveEmployee);
+                } finally {
+                    Utils.setBtnLoading($submitBtn, false);
                 }
             });
         },
@@ -772,6 +791,11 @@ export function initEmployeesPage() {
             $('#form-sub-company').on('change', () => {
                 void OptionsManager.refreshSquadOptions();
             });
+
+            $(document).on('change', '#form-system-role', () => {
+                FormManager.toggleAssignmentSection();
+            });
+
             ModalFlowManager.initLifecycleEvents();
             StatusTransitionManager.init();
             DeleteManager.init();

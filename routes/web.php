@@ -7,6 +7,8 @@ use App\Http\Controllers\Organization\SquadController;
 use App\Http\Controllers\Organization\SubCompanyController;
 use App\Http\Controllers\ServiceRequest\ServiceCatalogController;
 use App\Http\Controllers\ServiceRequest\ServiceRequestController;
+use App\Http\Controllers\Document\DocumentController;
+use App\Http\Controllers\EducationalObjective\EducationalObjectiveController;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/dashboard');
@@ -139,5 +141,132 @@ Route::middleware('auth')->group(function () {
             ->name('index');
     });
 
+    Route::prefix('documents')->name('documents.')->group(function () {
+        Route::middleware('permission:documents.view')->group(function () {
+            Route::get('/', [DocumentController::class, 'index'])->name('index');
+            Route::get('/all', [DocumentController::class, 'all'])->name('all');
+            Route::get('/stats', [DocumentController::class, 'stats'])->name('stats');
+            Route::get('/datatable', [DocumentController::class, 'datatable'])->name('datatable');
+        });
+
+        Route::post('/', [DocumentController::class, 'store'])
+            ->middleware('permission:documents.create')
+            ->name('store');
+
+        Route::post('/{document}', [DocumentController::class, 'update']) // Use POST since we are submitting files, Laravel form override
+            ->middleware('permission:documents.update')
+            ->name('update');
+
+        Route::delete('/{document}', [DocumentController::class, 'destroy'])
+            ->middleware('permission:documents.destroy')
+            ->name('destroy');
+    });
+
+    Route::prefix('my-documents')->name('my-documents.')->group(function () {
+        Route::get('/', [DocumentController::class, 'employeeIndex'])->name('index');
+        Route::get('/list', [DocumentController::class, 'myDocumentsList'])->name('list');
+        Route::get('/stats', [DocumentController::class, 'myDocumentsStats'])->name('stats');
+        Route::post('/{document}/mark-viewed', [DocumentController::class, 'markViewed'])->name('mark-viewed');
+        Route::post('/{document}/acknowledge', [DocumentController::class, 'acknowledge'])->name('acknowledge');
+    });
+
+    Route::prefix('educational-objectives')->name('educational-objectives.')->group(function () {
+        Route::middleware('permission:educational-objectives.manage|educational-objectives.manage-all')->group(function () {
+            Route::get('/', [EducationalObjectiveController::class, 'index'])->name('index');
+            Route::get('/stats', [EducationalObjectiveController::class, 'stats'])->name('stats');
+            Route::get('/datatable', [EducationalObjectiveController::class, 'datatable'])->name('datatable');
+            Route::post('/', [EducationalObjectiveController::class, 'store'])->name('store');
+            Route::delete('/{objective}', [EducationalObjectiveController::class, 'destroy'])->name('destroy');
+        });
+    });
+
+    Route::prefix('my-educational-objectives')->name('my-objectives.')->group(function () {
+        Route::middleware('permission:educational-objectives.view')->group(function () {
+            Route::get('/', [EducationalObjectiveController::class, 'myObjectives'])->name('index');
+            Route::get('/list', [EducationalObjectiveController::class, 'myObjectivesList'])->name('list');
+            Route::get('/stats', [EducationalObjectiveController::class, 'myObjectivesStats'])->name('stats');
+            Route::post('/{objective}/progress', [EducationalObjectiveController::class, 'updateProgress'])->name('update-progress');
+            Route::post('/{objective}/complete', [EducationalObjectiveController::class, 'markCompleted'])->name('complete');
+        });
+    });
+
     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
 });
+
+// ─── EMAIL PREVIEWS (LOCAL ONLY) ─────────────────────────────────────────────
+if (app()->environment('local')) {
+    Route::prefix('emails/preview')->group(function () {
+        Route::get('/sr-submitted', function () {
+            $user = \App\Models\User::first() ?? new \App\Models\User(['full_name' => 'John Doe']);
+            $sr = new \App\Models\ServiceRequest([
+                'id' => 123,
+                'justification' => 'Need a new high-performance laptop for development.',
+                'service_name_snapshot' => 'MacBook Pro 16"',
+                'service_category_snapshot' => 'Hardware',
+            ]);
+            $sr->setRelation('requester', $user);
+
+            return view('emails.notifications.service-request-submitted', [
+                'subject' => 'New Service Request',
+                'serviceRequest' => $sr,
+                'serviceName' => 'MacBook Pro 16"',
+                'serviceCategory' => 'Hardware',
+                'statusLabel' => 'Submitted',
+                'note' => 'Please prioritize this request.',
+            ]);
+        });
+
+        Route::get('/sr-status', function () {
+            $sr = new \App\Models\ServiceRequest([
+                'id' => 123,
+                'service_name_snapshot' => 'Conference Room Access',
+            ]);
+            return view('emails.notifications.service-request-status-changed', [
+                'subject' => 'Request Status Updated',
+                'serviceRequest' => $sr,
+                'serviceName' => 'Conference Room Access',
+                'fromStatusLabel' => 'Pending',
+                'toStatusLabel' => 'Approved',
+                'note' => 'Access granted for tomorrow.',
+                'rejectionReason' => null,
+                'fulfillmentNote' => 'Keys are at the reception.',
+            ]);
+        });
+
+        Route::get('/employee-added', function () {
+            $user = new \App\Models\User([
+                'full_name' => 'Alice Smith',
+                'email' => 'alice@funflow.org',
+                'username' => 'alice.smith',
+            ]);
+            return view('emails.notifications.employee-added', [
+                'subject' => 'Employee Profile Created',
+                'employee' => $user,
+                'employeeUsername' => 'alice.smith',
+                'initialPassword' => 'Welcome2026!',
+                'statusLabel' => 'Active',
+                'assignmentSnapshot' => [
+                    ['sub_company_name' => 'Funflow Tech', 'squad_name' => 'DevOps', 'hierarchy_title' => 'Senior Engineer']
+                ],
+                'note' => 'Welcome to the team!',
+            ]);
+        });
+
+        Route::get('/employee-status', function () {
+            $user = new \App\Models\User([
+                'full_name' => 'Bob Wilson',
+                'email' => 'bob@funflow.org',
+            ]);
+            return view('emails.notifications.employee-status-changed', [
+                'subject' => 'Employee Status Updated',
+                'employee' => $user,
+                'fromStatusLabel' => 'Onboarding',
+                'toStatusLabel' => 'Joined',
+                'assignmentSnapshot' => [
+                    ['sub_company_name' => 'Funflow HQ', 'squad_name' => 'Finance', 'hierarchy_title' => 'Manager']
+                ],
+                'note' => 'Probation period completed successfully.',
+            ]);
+        });
+    });
+}

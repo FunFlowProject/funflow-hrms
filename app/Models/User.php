@@ -7,6 +7,8 @@ namespace App\Models;
 use App\Enums\ContractType;
 use App\Enums\EmployeeStatus;
 use App\Enums\SystemRole;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -59,10 +61,10 @@ class User extends Authenticatable
     ];
 
     /**
-    * The attributes that should be hidden for serialization.
-    *
-    * @var list<string>
-    */
+     * The attributes that should be hidden for serialization.
+     *
+     * @var list<string>
+     */
     protected $hidden = [
         'password',
         'remember_token',
@@ -98,6 +100,15 @@ class User extends Authenticatable
         return $this->hasMany(EmployeeAssignment::class, 'user_id');
     }
 
+    /**
+     * Scope a query to only include employees (excluding HR and Admins).
+     */
+    #[Scope]
+    protected function employees(Builder $query): void
+    {
+        $query->where('system_role', SystemRole::Employee);
+    }
+
     // Get status history entries for this statusable entity.
     public function statusHistories(): MorphMany
     {
@@ -121,5 +132,23 @@ class User extends Authenticatable
     public function handledServiceRequests(): HasMany
     {
         return $this->hasMany(ServiceRequest::class, 'handled_by');
+    }
+
+    // Get documents acknowledged or viewed by the user.
+    public function documents(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Document::class, 'document_user')
+            ->using(DocumentUser::class)
+            ->withPivot(['status', 'acknowledged_at'])
+            ->withTimestamps();
+    }
+
+    // Get educational objectives assigned to the user.
+    public function educationalObjectives(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(EducationalObjective::class, 'educational_objective_user')
+            ->using(EducationalObjectiveUser::class)
+            ->withPivot(['status', 'progress_notes', 'completed_at'])
+            ->withTimestamps();
     }
 }

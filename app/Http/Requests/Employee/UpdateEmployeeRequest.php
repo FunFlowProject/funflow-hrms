@@ -31,10 +31,10 @@ class UpdateEmployeeRequest extends FormRequest
             'contract_type' => ['required', 'in:full-time,intern,ambassador'],
             'system_role' => ['required', 'in:admin,hr,employee'],
 
-            'assignments' => ['nullable', 'array'],
-            'assignments.*.sub_company_id' => ['required', 'integer', 'exists:sub_companies,id'],
+            'assignments' => ['nullable', 'array', 'required_if:system_role,employee'],
+            'assignments.*.sub_company_id' => ['required_if:system_role,employee', 'integer', 'exists:sub_companies,id'],
             'assignments.*.squad_id' => ['nullable', 'integer', 'exists:squads,id'],
-            'assignments.*.hierarchy_id' => ['required', 'integer', 'exists:hierarchies,id'],
+            'assignments.*.hierarchy_id' => ['required_if:system_role,employee', 'integer', 'exists:hierarchies,id'],
         ];
     }
 

@@ -32,7 +32,7 @@ class HrDashboardService
 
         $actorId = (int) (Auth::id() ?? 0);
 
-        $employeeStats = User::query()
+        $employeeStats = User::employees()
             ->selectRaw('SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as pending_count', [$pendingValue])
             ->selectRaw('SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as onboarding_count', [$onboardingValue])
             ->selectRaw('SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as joined_count', [$joinedValue])

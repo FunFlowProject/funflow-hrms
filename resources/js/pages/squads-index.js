@@ -476,9 +476,12 @@ export function initSquadsPage() {
         init() {
             $('#squad-form').on('submit', async function submitSquadForm(event) {
                 event.preventDefault();
+
+                const $submitBtn = $(this).find('button[type="submit"]');
                 Utils.clearFormErrors('#squad-form-errors');
 
                 const { id, isEdit, payload } = FormManager.getSubmitPayload();
+                Utils.setBtnLoading($submitBtn, true);
 
                 try {
                     const response = isEdit
@@ -496,6 +499,8 @@ export function initSquadsPage() {
                     }
 
                     Utils.showAlert('danger', error.responseJSON?.message ?? TRANSLATION.error.saveSquad);
+                } finally {
+                    Utils.setBtnLoading($submitBtn, false);
                 }
             });
         },

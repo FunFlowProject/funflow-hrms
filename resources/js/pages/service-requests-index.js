@@ -660,6 +660,8 @@ export function initServiceRequestsPage() {
         init() {
             $('#service-request-form').on('submit', async function submitServiceRequestForm(event) {
                 event.preventDefault();
+
+                const $submitBtn = $(this).find('button[type="submit"]');
                 Utils.clearFormErrors('#service-request-form-errors');
 
                 if (!FormManager.validateJustification()) {
@@ -667,6 +669,7 @@ export function initServiceRequestsPage() {
                 }
 
                 const { id, isEdit, payload } = FormManager.getSubmitPayload();
+                Utils.setBtnLoading($submitBtn, true);
 
                 try {
                     const response = isEdit
@@ -684,6 +687,8 @@ export function initServiceRequestsPage() {
                     }
 
                     Utils.showAlert('danger', error.responseJSON?.message ?? TRANSLATION.error.saveRequest);
+                } finally {
+                    Utils.setBtnLoading($submitBtn, false);
                 }
             });
         },
