@@ -132,6 +132,7 @@ class RolePermissionSeeder extends Seeder
                 'service-requests.create',
             ], fn($p) => !str_ends_with($p, '.my.view'))),
             'employee' => [
+                'service-catalog.view',
                 'service-requests.view',
                 'service-requests.create',
                 'documents.my.view',
