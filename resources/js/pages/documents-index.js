@@ -21,6 +21,8 @@ export function initDocumentsPage() {
         documents: Utils.createEndpoints(pageNode.dataset, {
             subCompaniesAll: 'subCompaniesAllUrl',
             squadsAll: 'squadsAllUrl',
+            show: 'showUrlTemplate',
+            statusInfo: 'statusInfoUrlTemplate',
         }),
     };
 
@@ -126,15 +128,13 @@ export function initDocumentsPage() {
 
     const ApiManager = {
         async fetchDocument(docId) {
-            // documents.show doesn't exist yet, we'll assume we can't fetch single details strictly
-            // If needed we can pass details in data-attributes or create a show route.
-            // Since we didn't add a show route in update, we'll skip population via ajax or add it if needed later.
-            // Let's assume we can fetch it if needed.
-            // For now, we return empty on edit until a show route is implemented, 
-            // but let's assume we added a show route or we can extract from table data in real scenario.
-            // Actually I'll use the table data if possible, but let's query the table's API directly... wait, no.
-            // We can fetch table row data using DataTables API.
-            return null; 
+            const response = await $.get(ROUTES.documents.show(docId));
+            return response?.data ?? null; 
+        },
+
+        async fetchStatusInfo(docId) {
+            const response = await $.get(ROUTES.documents.statusInfo(docId));
+            return response?.data ?? [];
         },
 
         async fetchStats() {
@@ -319,8 +319,6 @@ export function initDocumentsPage() {
             FormManager.reset();
             $('#document-modal-title').text(TRANSLATION.modal.editTitle);
             
-            // Populate form from datatable row source data since we don't have a show API
-            // Usually we would fetch it from API or row data
             $('#document_id').val(docData.id);
             $('#form-document-name').val(docData.name);
             $('#form-document-classification').val(docData.classification).trigger('change.select2');
@@ -371,17 +369,71 @@ export function initDocumentsPage() {
                     return;
                 }
 
-                // Get row data from DataTables
-                const $tr = $(trigger).closest('tr');
-                const rowData = TableManager.table.row($tr).data();
-
-                if (rowData) {
-                    await this.prepareEdit(rowData);
-                } else {
+                try {
+                    const rowData = await ApiManager.fetchDocument(docId);
+                    if (rowData) {
+                        await this.prepareEdit(rowData);
+                    } else {
+                        throw new Error('Not found');
+                    }
+                } catch(error) {
                      Utils.showAlert('danger', TRANSLATION.error.loadDocumentEdit);
                      event.preventDefault();
                 }
             });
+
+            const statusModal = document.getElementById('documentStatusModal');
+            if (statusModal) {
+                statusModal.addEventListener('show.bs.modal', async (event) => {
+                    const trigger = event.relatedTarget;
+                    const docId = trigger.dataset.id;
+                    const docName = trigger.dataset.name;
+
+                    if (!docId) {
+                        event.preventDefault();
+                        return;
+                    }
+
+                    $('#document-status-modal-title').text(`Status: ${docName}`);
+                    
+                    const $tbody = $('#document-status-tbody');
+                    $tbody.html('<tr><td colspan="3" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div></td></tr>');
+
+                    try {
+                        const employees = await ApiManager.fetchStatusInfo(docId);
+                        
+                        $tbody.empty();
+                        
+                        if (employees.length === 0) {
+                            $tbody.html('<tr><td colspan="3" class="text-center py-4 text-muted">No employees are required to view this document.</td></tr>');
+                            return;
+                        }
+
+                        employees.forEach(emp => {
+                            let statusBadge = '';
+                            if (emp.status_raw === 'acknowledged') {
+                                statusBadge = `<span class="badge bg-success">${emp.status}</span>`;
+                            } else if (emp.status_raw === 'viewed') {
+                                statusBadge = `<span class="badge bg-info">${emp.status}</span>`;
+                            } else {
+                                statusBadge = `<span class="badge bg-secondary">${emp.status}</span>`;
+                            }
+
+                            const ackAt = emp.acknowledged_at ? emp.acknowledged_at : '<span class="text-muted">-</span>';
+
+                            $tbody.append(`
+                                <tr>
+                                    <td class="fw-medium">${emp.full_name}</td>
+                                    <td>${statusBadge}</td>
+                                    <td>${ackAt}</td>
+                                </tr>
+                            `);
+                        });
+                    } catch (error) {
+                        $tbody.html('<tr><td colspan="3" class="text-center py-4 text-danger">Failed to load status information.</td></tr>');
+                    }
+                });
+            }
 
             DOM.formModal.addEventListener('hidden.bs.modal', () => {
                 Utils.setFormLoading('#document-form', false);

@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+use App\Notifications\Auth\ResetPasswordNotification;
 
 /**
  * User Model
@@ -150,5 +151,16 @@ class User extends Authenticatable
             ->using(EducationalObjectiveUser::class)
             ->withPivot(['status', 'progress_notes', 'completed_at'])
             ->withTimestamps();
+    }
+
+    /**
+     * Send the password reset notification.
+     *
+     * @param  string  $token
+     * @return void
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ResetPasswordNotification($token));
     }
 }

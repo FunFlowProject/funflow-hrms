@@ -42,7 +42,7 @@
                         <li>
                             <a class="dropdown-item btn-view-employee view{{ $typeSuffix }}Btn" href="javascript:void(0);"
                                 @if ($id) data-id="{{ $id }}" @endif data-bs-toggle="modal"
-                                data-bs-target="#employeeViewModal">
+                                data-bs-target="{{ '#' . lcfirst($typeSuffix) . 'ViewModal' }}">
                                 <i class="bx bx-show me-1"></i> {{ __('view') }}
                             </a>
                         </li>
@@ -50,7 +50,7 @@
                         <li>
                             <a class="dropdown-item btn-edit-employee edit{{ $typeSuffix }}Btn" href="javascript:void(0);"
                                 @if ($id) data-id="{{ $id }}" @endif data-modal-mode="edit"
-                                data-bs-toggle="modal" data-bs-target="#employeeFormModal">
+                                data-bs-toggle="modal" data-bs-target="{{ '#' . lcfirst($typeSuffix) . 'FormModal' }}">
                                 <i class="bx bx-edit-alt me-1"></i> {{ __('edit') }}
                             </a>
                         </li>

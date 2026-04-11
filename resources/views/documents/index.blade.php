@@ -1,6 +1,7 @@
 <x-layouts.app title="Documents">
     <div id="documents-page" data-store-url="{{ route('documents.store') }}"
-        data-show-url-template="" 
+        data-show-url-template="{{ route('documents.show', ['document' => '__id__']) }}" 
+        data-status-info-url-template="{{ route('documents.status-info', ['document' => '__id__']) }}"
         data-update-url-template="{{ route('documents.update', ['document' => '__id__']) }}"
         data-destroy-url-template="{{ route('documents.destroy', ['document' => '__id__']) }}"
         data-sub-companies-all-url="{{ route('sub-companies.all') }}"
@@ -114,6 +115,7 @@
         </x-ui.data-table-card>
 
         <x-documents.form-modal />
+        <x-documents.status-modal />
 
     </div>
 </x-layouts.app>

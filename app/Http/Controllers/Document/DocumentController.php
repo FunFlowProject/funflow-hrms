@@ -64,6 +64,32 @@ class DocumentController extends Controller
         }
     }
 
+    /** Retrieve a specific document details. */
+    public function show(int $id)
+    {
+        try {
+            return $this->apiResponse(
+                data: $this->documentService->show($id),
+                message: 'Document fetched successfully.',
+            );
+        } catch (Throwable $e) {
+            return $this->reportError($e, 'Unable to fetch document');
+        }
+    }
+
+    /** Retrieve status info for a document (who viewed/acknowledged). */
+    public function statusInfo(int $id)
+    {
+        try {
+            return $this->apiResponse(
+                data: $this->documentService->statusInfo($id),
+                message: 'Document status info fetched successfully.',
+            );
+        } catch (Throwable $e) {
+            return $this->reportError($e, 'Unable to fetch document status info');
+        }
+    }
+
     /** Store a newly created document. */
     public function store(StoreDocumentRequest $request)
     {

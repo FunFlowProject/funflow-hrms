@@ -44,6 +44,12 @@ class DocumentService
         return DocumentStatsDto::fromMetrics($metrics);
     }
 
+    public function show(int $id): DocumentDto
+    {
+        $document = Document::with(['subCompany', 'squad'])->findOrFail($id);
+        return DocumentDto::fromModel($document);
+    }
+
     public function datatable(): JsonResponse
     {
         $query = Document::query()->with(['subCompany', 'squad']);
@@ -143,6 +149,45 @@ class DocumentService
         $document->delete();
     }
 
+    public function statusInfo(int $id): array
+    {
+        $document = Document::with('users')->findOrFail($id);
+        $employees = User::employees()->with('assignments')->get();
+
+        $filteredEmployees = $employees->filter(function (User $user) use ($document) {
+            if ($document->scope_type === DocumentScope::Company) {
+                return true;
+            }
+
+            $assignments = $user->assignments;
+            if ($document->scope_type === DocumentScope::SubCompany) {
+                return $assignments->contains('sub_company_id', $document->scope_id);
+            }
+            if ($document->scope_type === DocumentScope::Squad) {
+                return $assignments->contains('squad_id', $document->scope_id);
+            }
+
+            return false;
+        });
+
+        $result = [];
+        foreach ($filteredEmployees as $employee) {
+            $pivot = $document->users->firstWhere('id', $employee->id)?->pivot;
+            $statusValue = $pivot?->status->value ?? \App\Enums\DocumentEmployeeStatus::New->value;
+            $statusLabel = \App\Enums\DocumentEmployeeStatus::from($statusValue)->label();
+
+            $result[] = [
+                'id' => $employee->id,
+                'full_name' => $employee->full_name,
+                'status' => $statusLabel,
+                'status_raw' => $statusValue,
+                'acknowledged_at' => $pivot?->acknowledged_at ? $pivot->acknowledged_at->format('d M Y, h:i A') : null,
+            ];
+        }
+
+        return array_values($result);
+    }
+
     private function applySearchFilters(Builder $query): Builder
     {
         $searchName = request('search_name');
@@ -190,6 +235,19 @@ class DocumentService
             'deleteName' => $document->name,
             'editClass' => 'editDocumentBtn',
             'deleteClass' => 'deleteDocumentBtn',
+            'singleActions' => [
+                [
+                    'label' => 'View Status',
+                    'icon' => 'bx bx-info-circle',
+                    'action' => 'status',
+                    'class' => 'statusDocumentBtn',
+                    'tone' => 'info',
+                    'show_label' => false,
+                    'modal_toggle' => 'modal',
+                    'modal_target' => '#documentStatusModal',
+                    'data' => ['id' => $document->id, 'name' => $document->name]
+                ]
+            ]
         ])->render();
     }
 }

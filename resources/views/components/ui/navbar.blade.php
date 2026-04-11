@@ -1,6 +1,6 @@
 @php
     $user = auth()->user();
-    $displayName = $user?->name ?? 'Guest User';
+    $displayName = $user?->username ?? 'Guest User';
     $displayEmail = $user?->email ?? 'guest@example.com';
 @endphp
 

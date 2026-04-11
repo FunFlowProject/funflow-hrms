@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\PasswordResetLinkController;
+use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Dashboard\AdminDashboardController;
 use App\Http\Controllers\Employee\EmployeeController;
 use App\Http\Controllers\Organization\SquadController;
@@ -16,6 +18,11 @@ Route::redirect('/', '/dashboard');
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'create'])->name('login');
     Route::post('/login', [LoginController::class, 'store'])->name('login.attempt');
+
+    Route::get('/forgot-password', [PasswordResetLinkController::class, 'create'])->name('password.request');
+    Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])->name('password.email');
+    Route::get('/reset-password/{token}', [NewPasswordController::class, 'create'])->name('password.reset');
+    Route::post('/reset-password', [NewPasswordController::class, 'store'])->name('password.update');
 });
 
 Route::middleware('auth')->group(function () {
@@ -147,6 +154,8 @@ Route::middleware('auth')->group(function () {
             Route::get('/all', [DocumentController::class, 'all'])->name('all');
             Route::get('/stats', [DocumentController::class, 'stats'])->name('stats');
             Route::get('/datatable', [DocumentController::class, 'datatable'])->name('datatable');
+            Route::get('/{document}', [DocumentController::class, 'show'])->name('show');
+            Route::get('/{document}/status-info', [DocumentController::class, 'statusInfo'])->name('status-info');
         });
 
         Route::post('/', [DocumentController::class, 'store'])
@@ -194,8 +203,10 @@ Route::middleware('auth')->group(function () {
         ->middleware('permission:work-logs.my.view')
         ->name('my-work-logs.index');
 
-    Route::prefix('work-logs')->name('work-logs.')->middleware('permission:work-logs.view-all')->group(function () {
-        Route::get('/', [\App\Http\Controllers\WorkLog\WorkLogController::class, 'index'])->name('index');
+    Route::prefix('work-logs')->name('work-logs.')->middleware('permission:work-logs.view-all|work-logs.my.view')->group(function () {
+        Route::get('/', [\App\Http\Controllers\WorkLog\WorkLogController::class, 'index'])
+            ->middleware('permission:work-logs.view-all')
+            ->name('index');
         Route::get('/datatable', [\App\Http\Controllers\WorkLog\WorkLogController::class, 'datatable'])->name('datatable');
         Route::get('/{workLog}', [\App\Http\Controllers\WorkLog\WorkLogController::class, 'show'])->name('show');
         Route::post('/', [\App\Http\Controllers\WorkLog\WorkLogController::class, 'store'])->name('store');
@@ -226,6 +237,15 @@ if (app()->environment('local')) {
                 'serviceCategory' => 'Hardware',
                 'statusLabel' => 'Submitted',
                 'note' => 'Please prioritize this request.',
+            ]);
+        });
+
+        Route::get('/password-reset', function () {
+            return view('emails.notifications.password-reset', [
+                'subject' => \Illuminate\Support\Facades\Lang::get('Reset Password Notification'),
+                'url' => url('/reset-password/sample-token-123?email=jane@example.com'),
+                'count' => config('auth.passwords.'.config('auth.defaults.passwords').'.expire'),
+                'user' => new \App\Models\User(['full_name' => 'Jane Doe', 'email' => 'jane@example.com']),
             ]);
         });
 

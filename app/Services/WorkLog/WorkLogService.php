@@ -65,6 +65,8 @@ class WorkLogService
     public function update(int $id, array $data): WorkLogDto
     {
         $workLog = WorkLog::findOrFail($id);
+        $this->authorizeAccess($workLog);
+
         $tasks = (array) ($data['tasks'] ?? []);
         $totalDuration = collect($tasks)->sum('duration_minutes');
 
@@ -82,6 +84,8 @@ class WorkLogService
     public function show(int $id): WorkLogDto
     {
         $workLog = WorkLog::with('user')->findOrFail($id);
+        $this->authorizeAccess($workLog);
+        
         return WorkLogDto::fromModel($workLog);
     }
 
@@ -91,7 +95,17 @@ class WorkLogService
     public function destroy(int $id): bool
     {
         $workLog = WorkLog::findOrFail($id);
+        $this->authorizeAccess($workLog);
+        
         return $workLog->delete();
+    }
+
+    private function authorizeAccess(WorkLog $log): void
+    {
+        $actor = Auth::user();
+        if ($log->user_id !== $actor->id && !$actor->can('work-logs.manage') && !$actor->can('work-logs.view-all')) {
+            abort(403, 'Unauthorized action.');
+        }
     }
 
     private function renderActions(WorkLog $log): string
