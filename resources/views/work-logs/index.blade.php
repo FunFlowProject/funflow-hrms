@@ -15,10 +15,6 @@
                         aria-controls="work-logs-search-filters">
                         <i class="bx bx-filter-alt me-1"></i>Search & Filters
                     </button>
-                    <button type="button" class="btn btn-primary px-4 py-2 fw-bold" data-bs-toggle="modal" 
-                        data-bs-target="#workLogFormModal">
-                        <i class="bx bx-plus me-1"></i>Log Work
-                    </button>
                 </div>
             </x-slot:actions>
         </x-ui.page-header>

@@ -24,7 +24,6 @@ class UpdateEmployeeRequest extends FormRequest
             'full_name' => ['required_without:name', 'string', 'min:2', 'max:100'],
             'name' => ['required_without:full_name', 'string', 'min:2', 'max:100'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($employeeId)],
-            'phone_number' => ['required_without:phone', 'string', 'max:30', Rule::unique('users', 'phone_number')->ignore($employeeId)],
             'phone' => ['required_without:phone_number', 'string', 'max:30', Rule::unique('users', 'phone_number')->ignore($employeeId)],
             'date_of_birth' => ['required', 'date', 'before_or_equal:' . now()->subYears(18)->toDateString()],
             'hire_date' => ['required', 'date', 'before_or_equal:today'],

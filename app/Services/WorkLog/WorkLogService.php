@@ -47,6 +47,12 @@ class WorkLogService
     public function store(array $data): WorkLogDto
     {
         $actor = Auth::user();
+
+        // Safety check: Admins should not be logging work here
+        if ($actor->can('work-logs.view-all') && !$actor->can('work-logs.my.view')) {
+            abort(403, 'Administrators cannot log work directly.');
+        }
+
         $tasks = (array) ($data['tasks'] ?? []);
         $totalDuration = collect($tasks)->sum('duration_minutes');
 

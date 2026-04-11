@@ -130,7 +130,7 @@ class EducationalObjectiveController extends Controller
     public function updateProgress(UpdateObjectiveProgressRequest $request, int $id)
     {
         try {
-            $this->employeeObjectiveService->updateProgress(Auth::user(), $id, $request->validated('progress_notes'));
+            $this->employeeObjectiveService->updateProgress(Auth::user(), $id, $request->validated()['progress_notes']);
 
             return $this->apiResponse(
                 data: null,

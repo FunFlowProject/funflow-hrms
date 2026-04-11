@@ -10,7 +10,7 @@ class UpdateObjectiveProgressRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true; // Any authenticated user evaluating their own objectives
+        return true;
     }
 
     public function rules(): array

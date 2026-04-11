@@ -223,9 +223,12 @@ class EmployeeService
         $plainPassword = Str::password(14);
 
         $user = DB::transaction(function () use ($data, $contractType, $status, $systemRole, $creationNote, $plainPassword): User {
+            $username = $data['username'] ?? $this->generateUsername($data['full_name'] ?? $data['name']);
+
             $created = User::query()->create([
                 'full_name' => $data['full_name'] ?? $data['name'],
                 'email' => $data['email'],
+                'username' => $username,
                 'phone_number' => $data['phone_number'] ?? $data['phone'] ?? null,
                 'date_of_birth' => $data['date_of_birth'] ?? null,
                 'hire_date' => $data['hire_date'] ?? null,
@@ -290,6 +293,7 @@ class EmployeeService
                 'hire_date' => $data['hire_date'] ?? $user->hire_date,
                 'contract_type' => ContractType::safeFrom($data['contract_type'] ?? null) ?? $user->contract_type,
                 'system_role' => SystemRole::safeFrom($data['system_role'] ?? null) ?? $user->system_role,
+                'username' => $data['username'] ?? $user->username,
             ];
 
             $oldRole = $user->system_role;
@@ -641,7 +645,7 @@ class EmployeeService
             ->all();
     }
 
-    private function isEmailExists(string $email, ?int $id = null): bool
+    public function isEmailExists(string $email, ?int $id = null): bool
     {
         $query = User::query()->where('email', $email);
 
@@ -652,4 +656,39 @@ class EmployeeService
         return $query->exists();
     }
 
+    /**
+     * Generate a unique username based on the full name and the estimated next ID.
+     */
+    private function generateUsername(string $fullName): string
+    {
+        $nameParts = array_values(array_filter(preg_split('/\s+/', trim($fullName))));
+
+        $firstInitial = '';
+        $lastName = 'employee';
+
+        if (!empty($nameParts)) {
+            $firstInitial = mb_substr(mb_strtolower($nameParts[0]), 0, 1);
+            $lastName = mb_strtolower($nameParts[count($nameParts) - 1]);
+        }
+
+        $base = Str::of($firstInitial . $lastName)
+            ->ascii()
+            ->replaceMatches('/[^a-z0-9]+/', '')
+            ->whenEmpty(fn () => 'employee');
+
+        // Estimate next ID
+        $nextId = (User::max('id') ?? 0) + 1;
+
+        $username = (string) $base . $nextId;
+
+        // Ensure uniqueness if for some reason collisions occur
+        $originalUsername = $username;
+        $counter = 1;
+        while (User::where('username', $username)->exists()) {
+            $username = $originalUsername . $counter;
+            $counter++;
+        }
+
+        return $username;
+    }
 }
