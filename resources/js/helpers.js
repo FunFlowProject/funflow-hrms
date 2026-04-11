@@ -113,7 +113,11 @@ export function createEndpoints(dataset, extras = {}) {
     };
 
     for (const [key, datasetKey] of Object.entries(extras)) {
-        endpoints[key] = dataset[datasetKey];
+        if (datasetKey.endsWith('UrlTemplate')) {
+            endpoints[key] = (id) => resolveUrl(dataset[datasetKey], id);
+        } else {
+            endpoints[key] = dataset[datasetKey];
+        }
     }
 
     return endpoints;
