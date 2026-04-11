@@ -53,7 +53,7 @@ export function initSubCompaniesPage() {
     };
 
     const DOM = {
-        formModal: document.getElementById('employeeFormModal'),
+        formModal: document.getElementById('subCompanyFormModal'),
         viewModal: document.getElementById('employeeViewModal'),
         form: document.getElementById('sub-company-form'),
     };
@@ -420,7 +420,7 @@ export function initSubCompaniesPage() {
             $('#sub-company-form').on('submit', async function submitSubCompanyForm(event) {
                 event.preventDefault();
 
-                const $submitBtn = $(this).find('button[type="submit"]');
+                const $submitBtn = Utils.getFormSubmitBtn(this);
                 Utils.clearFormErrors('#sub-company-form-errors');
 
                 const { id, isEdit, payload } = FormManager.getSubmitPayload();

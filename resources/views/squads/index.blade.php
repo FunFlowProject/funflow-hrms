@@ -18,7 +18,7 @@
 
                     @can('squads.create')
                         <button id="btn-create-squad" type="button" class="btn btn-primary px-4 py-2 shadow-sm fw-bold"
-                            data-bs-toggle="modal" data-bs-target="#employeeFormModal" data-modal-mode="create">
+                             data-bs-toggle="modal" data-bs-target="#squadFormModal" data-modal-mode="create">
                             + Add New Squad
                         </button>
                     @endcan

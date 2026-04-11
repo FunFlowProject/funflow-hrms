@@ -59,7 +59,7 @@ export function initSquadsPage() {
     };
 
     const DOM = {
-        formModal: document.getElementById('employeeFormModal'),
+        formModal: document.getElementById('squadFormModal'),
         viewModal: document.getElementById('employeeViewModal'),
         form: document.getElementById('squad-form'),
     };
@@ -477,7 +477,7 @@ export function initSquadsPage() {
             $('#squad-form').on('submit', async function submitSquadForm(event) {
                 event.preventDefault();
 
-                const $submitBtn = $(this).find('button[type="submit"]');
+                const $submitBtn = Utils.getFormSubmitBtn(this);
                 Utils.clearFormErrors('#squad-form-errors');
 
                 const { id, isEdit, payload } = FormManager.getSubmitPayload();

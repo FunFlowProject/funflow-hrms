@@ -743,7 +743,7 @@ export function initEmployeesPage() {
             $('#employee-form').on('submit', async function submitEmployeeForm(event) {
                 event.preventDefault();
 
-                const $submitBtn = $(this).find('button[type="submit"]');
+                const $submitBtn = Utils.getFormSubmitBtn(this);
                 Utils.clearFormErrors('#employee-form-errors');
 
                 if (!FormManager.validateAssignmentPair()) {

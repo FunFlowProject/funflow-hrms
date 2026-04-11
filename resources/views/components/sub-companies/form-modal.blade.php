@@ -2,7 +2,7 @@
     $activeOptions = \App\Enums\ActiveStatus::options();
 @endphp
 
-<x-ui.modal id="employeeFormModal" size="lg" :scrollable="true" body-class="px-4 pt-0">
+<x-ui.modal id="subCompanyFormModal" size="lg" :scrollable="true" body-class="px-4 pt-0">
     <x-slot:header>
         <h5 class="modal-title fw-bolder text-dark" id="sub-company-modal-title">Create Sub-Company</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>

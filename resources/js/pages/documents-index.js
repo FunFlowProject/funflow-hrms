@@ -499,7 +499,7 @@ export function initDocumentsPage() {
             $('#document-form').on('submit', async function submitDocumentForm(event) {
                 event.preventDefault();
 
-                const $submitBtn = $(this).find('button[type="submit"]');
+                const $submitBtn = Utils.getFormSubmitBtn(this);
                 
                 // Form validation markup
                 if (!this.checkValidity()) {

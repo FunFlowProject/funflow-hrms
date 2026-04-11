@@ -307,6 +307,25 @@ export function setFormLoading(form, isLoading) {
 }
 
 /**
+ * Finds the submit button associated with a form.
+ * Handles buttons inside the form and buttons outside (linked via 'form' attribute).
+ *
+ * @param {string|Element|jQuery} form
+ * @returns {jQuery}
+ */
+export function getFormSubmitBtn(form) {
+    const $form = window.$(form);
+    const formId = $form.attr('id');
+    let $btn = $form.find('button[type="submit"]');
+
+    if (!$btn.length && formId) {
+        $btn = window.$(`button[type="submit"][form="${formId}"]`);
+    }
+
+    return $btn;
+}
+
+/**
  * Toggles a loading state on a button.
  * Disables the button and shows a spinner.
  *

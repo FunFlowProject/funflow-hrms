@@ -20,13 +20,11 @@
                         <i class="bx bx-filter-alt me-1"></i>Search & Filters
                     </button>
 
-                    @can('service-requests.create')
-                        <button id="btn-create-service-request" type="button"
-                            class="btn btn-primary px-4 py-2 shadow-sm fw-bold" data-bs-toggle="modal"
-                            data-bs-target="#employeeFormModal" data-modal-mode="create">
-                            + New Service Request
-                        </button>
-                    @endcan
+                    <button id="btn-create-service-request" type="button"
+                        class="btn btn-primary px-4 py-2 shadow-sm fw-bold" data-bs-toggle="modal"
+                        data-bs-target="#serviceRequestFormModal" data-modal-mode="create">
+                        + New Service Request
+                    </button>
                 </div>
             </x-slot:actions>
         </x-ui.page-header>

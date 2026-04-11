@@ -336,7 +336,7 @@ export function initWorkLogsPage() {
             $('#work-log-form').on('submit', async function(event) {
                 event.preventDefault();
 
-                const $submitBtn = $(this).find('button[type="submit"]');
+                const $submitBtn = Utils.getFormSubmitBtn(this);
                 Utils.clearFormErrors('#work-log-form-errors');
 
                 const { id, isEdit, payload } = FormManager.getSubmitPayload();

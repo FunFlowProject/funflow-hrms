@@ -365,7 +365,7 @@ export function initEducationalObjectivesPage() {
             $('#objective-form').on('submit', async function(event) {
                 event.preventDefault();
 
-                const $submitBtn = $(this).find('button[type="submit"]');
+                const $submitBtn = Utils.getFormSubmitBtn(this);
                 
                 if (!this.checkValidity()) {
                     event.stopPropagation();

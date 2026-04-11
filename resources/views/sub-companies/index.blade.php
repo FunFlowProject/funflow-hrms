@@ -18,7 +18,7 @@
                     @can('sub-companies.create')
                         <button id="btn-create-sub-company" type="button"
                             class="btn btn-primary px-4 py-2 shadow-sm fw-bold" data-bs-toggle="modal"
-                            data-bs-target="#employeeFormModal" data-modal-mode="create">
+                            data-bs-target="#subCompanyFormModal" data-modal-mode="create">
                             + Add New Sub-Company
                         </button>
                     @endcan

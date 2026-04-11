@@ -71,7 +71,7 @@ export function initServiceRequestsPage() {
     };
 
     const DOM = {
-        formModal: document.getElementById('employeeFormModal'),
+        formModal: document.getElementById('serviceRequestFormModal'),
         viewModal: document.getElementById('employeeViewModal'),
         form: document.getElementById('service-request-form'),
         saveButton: document.getElementById('service-request-save-button'),
@@ -661,7 +661,7 @@ export function initServiceRequestsPage() {
             $('#service-request-form').on('submit', async function submitServiceRequestForm(event) {
                 event.preventDefault();
 
-                const $submitBtn = $(this).find('button[type="submit"]');
+                const $submitBtn = Utils.getFormSubmitBtn(this);
                 Utils.clearFormErrors('#service-request-form-errors');
 
                 if (!FormManager.validateJustification()) {

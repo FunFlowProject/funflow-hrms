@@ -289,7 +289,7 @@ export function initMyObjectivesPage() {
             $(DOM.progressForm).on('submit', async function(e) {
                 e.preventDefault();
                 
-                const $submitBtn = $(this).find('button[type="submit"]');
+                const $submitBtn = Utils.getFormSubmitBtn(this);
                 Utils.clearFormErrors('#objective-progress-form-errors');
                 
                 const id = $('#progress_objective_id').val();

@@ -425,7 +425,7 @@ export function initServiceCatalogPage() {
             $('#service-catalog-form').on('submit', async function submitServiceCatalogForm(event) {
                 event.preventDefault();
 
-                const $submitBtn = $(this).find('button[type="submit"]');
+                const $submitBtn = Utils.getFormSubmitBtn(this);
                 Utils.clearFormErrors('#service-catalog-form-errors');
 
                 const { id, isEdit, payload } = FormManager.getSubmitPayload();

@@ -223,9 +223,11 @@ class EmployeeService
         $plainPassword = Str::password(14);
 
         $user = DB::transaction(function () use ($data, $contractType, $status, $systemRole, $creationNote, $plainPassword): User {
-            $username = $data['username'] ?? $this->generateUsername($data['full_name'] ?? $data['name']);
+            $nextId = max(1000, User::max('id') ?? 0) + 1;
+            $username = $data['username'] ?? $this->generateUsername($data['full_name'] ?? $data['name'], $nextId);
 
             $created = User::query()->create([
+                'id' => $nextId,
                 'full_name' => $data['full_name'] ?? $data['name'],
                 'email' => $data['email'],
                 'username' => $username,
@@ -659,7 +661,7 @@ class EmployeeService
     /**
      * Generate a unique username based on the full name and the estimated next ID.
      */
-    private function generateUsername(string $fullName): string
+    private function generateUsername(string $fullName, ?int $forceNextId = null): string
     {
         $nameParts = array_values(array_filter(preg_split('/\s+/', trim($fullName))));
 
@@ -677,7 +679,7 @@ class EmployeeService
             ->whenEmpty(fn () => 'employee');
 
         // Estimate next ID
-        $nextId = (User::max('id') ?? 0) + 1;
+        $nextId = $forceNextId ?? (max(1000, User::max('id') ?? 0) + 1);
 
         $username = (string) $base . $nextId;
 
