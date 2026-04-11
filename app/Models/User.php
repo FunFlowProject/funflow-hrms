@@ -101,12 +101,12 @@ class User extends Authenticatable
     }
 
     /**
-     * Scope a query to only include employees (excluding HR and Admins).
+     * Scope a query to only include employees and HR (excluding Admins).
      */
     #[Scope]
     protected function employees(Builder $query): void
     {
-        $query->where('system_role', SystemRole::Employee);
+        $query->whereIn('system_role', [SystemRole::Employee, SystemRole::Hr]);
     }
 
     // Get status history entries for this statusable entity.
