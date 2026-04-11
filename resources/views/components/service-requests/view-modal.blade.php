@@ -1,4 +1,4 @@
-<x-ui.modal id="employeeViewModal" title="Service Request Details" size="lg" :scrollable="true" body-class="px-4">
+<x-ui.modal id="serviceRequestViewModal" title="Service Request Details" size="lg" :scrollable="true" body-class="px-4">
     <div class="row g-4">
         <div class="col-md-6"><span
                 class="d-block text-secondary small fw-bold mb-1 text-uppercase tracking-wide">Service</span>

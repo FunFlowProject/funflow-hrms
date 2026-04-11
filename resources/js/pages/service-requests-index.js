@@ -72,7 +72,7 @@ export function initServiceRequestsPage() {
 
     const DOM = {
         formModal: document.getElementById('serviceRequestFormModal'),
-        viewModal: document.getElementById('employeeViewModal'),
+        viewModal: document.getElementById('serviceRequestViewModal'),
         form: document.getElementById('service-request-form'),
         saveButton: document.getElementById('service-request-save-button'),
         justificationRequiredIndicator: document.getElementById('justification-required-indicator'),
