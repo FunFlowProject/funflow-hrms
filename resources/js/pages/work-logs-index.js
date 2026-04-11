@@ -396,7 +396,6 @@ export function initWorkLogsPage() {
                 onReload: () => void TableManager.reload(),
                 resetButtonSelector: '#btn-reset-work-log-filters',
             });
-            Utils.initFlatpickr('#filter-log-date');
         },
     };
 

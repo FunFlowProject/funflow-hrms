@@ -315,6 +315,11 @@ export function setFormLoading(form, isLoading) {
  * @param {string} loadingText
  */
 export function setBtnLoading(selector, isLoading, loadingText = 'Processing...') {
+
+    // Unwrap jQuery objects automatically
+    if (selector && typeof selector === 'object' && selector.jquery) {
+        selector = selector.get(0);
+    }
     const btn = typeof selector === 'string' ? document.querySelector(selector) : selector;
     if (!btn) return;
 
