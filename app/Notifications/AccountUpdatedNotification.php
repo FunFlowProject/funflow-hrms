@@ -54,7 +54,6 @@ class AccountUpdatedNotification extends Notification
                 'subject' => \Illuminate\Support\Facades\Lang::get('Account Details Updated'),
                 'changes' => $this->changes,
                 'user' => $notifiable,
-                'mailMessage' => (new \Illuminate\Notifications\Messages\MailMessage),
             ]);
     }
 }

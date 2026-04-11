@@ -1,4 +1,4 @@
-<x-mail.email-layout :subject="$subject" :mail-message="$mailMessage">
+<x-mail.email-layout :subject="$subject" :mail-message="isset($message) ? $message : null">
 
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 24px;">
         <tr>

@@ -76,11 +76,11 @@ class EmployeeDocumentService
         
         if (!$pivot) {
             $document->users()->attach($user->id, [
-                'status' => 'viewed',
+                'status' => DocumentEmployeeStatus::Viewed->value,
             ]);
         } elseif ($pivot->status === DocumentEmployeeStatus::New) {
             $document->users()->updateExistingPivot($user->id, [
-                'status' => 'viewed',
+                'status' => DocumentEmployeeStatus::Viewed->value,
             ]);
         }
     }
@@ -92,16 +92,20 @@ class EmployeeDocumentService
             return;
         }
 
-        $pivot = $document->users()->where('user_id', $user->id)->first()?->pivot;
+        // Fetch the pivot directly using the relationship to ensure custom pivot models and casting are applied
+        $pivot = $document->users()
+            ->where('user_id', $user->id)
+            ->first()
+            ?->pivot;
 
         if (!$pivot) {
             $document->users()->attach($user->id, [
-                'status' => 'acknowledged',
+                'status' => DocumentEmployeeStatus::Acknowledged->value,
                 'acknowledged_at' => Carbon::now(),
             ]);
         } elseif ($pivot->status !== DocumentEmployeeStatus::Acknowledged) {
             $document->users()->updateExistingPivot($user->id, [
-                'status' => 'acknowledged',
+                'status' => DocumentEmployeeStatus::Acknowledged->value,
                 'acknowledged_at' => Carbon::now(),
             ]);
         }
