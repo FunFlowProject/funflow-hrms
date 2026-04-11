@@ -452,7 +452,7 @@ export function initSubCompaniesPage() {
     const SubCompanyApp = {
         initPlugins() {
             Utils.initSelect2('.select2-filter');
-            Utils.initSelect2('.select2-init', $('#employeeFormModal'));
+            Utils.initSelect2('.select2-init', $('#subCompanyFormModal'));
         },
 
         initEvents() {

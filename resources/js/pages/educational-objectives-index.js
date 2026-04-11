@@ -21,6 +21,7 @@ export function initEducationalObjectivesPage() {
         objectives: Utils.createEndpoints(pageNode.dataset, {
             subCompaniesAll: 'subCompaniesAllUrl',
             squadsAll: 'squadsAllUrl',
+            employeesAll: 'employeesAllUrl',
         }),
     };
 
@@ -135,6 +136,16 @@ export function initEducationalObjectivesPage() {
             const response = await $.get(ROUTES.objectives.squadsAll);
             return response?.data ?? [];
         },
+        
+        async fetchEmployees() {
+            const response = await $.get(ROUTES.objectives.employeesAll);
+            return response?.data ?? [];
+        },
+        
+        async fetchProgress(id) {
+            const response = await $.get(ROUTES.objectives.progress(id));
+            return response?.data ?? [];
+        },
 
         async createObjective(formData) {
             return $.ajax({
@@ -210,8 +221,11 @@ export function initEducationalObjectivesPage() {
                 } else if (scopeType === 'squad') {
                     data = await ApiManager.fetchSquads();
                     defaultText = TRANSLATION.options.squad;
-                    // Usually this is an indication that only subordinates will get affected
                     $notice.removeClass('d-none');
+                } else if (scopeType === 'individual') {
+                    data = await ApiManager.fetchEmployees();
+                    defaultText = 'Select Employee';
+                    $notice.addClass('d-none');
                 }
 
                 Utils.buildSelect2Options(
@@ -225,6 +239,60 @@ export function initEducationalObjectivesPage() {
             } catch (error) {
                 Utils.showAlert('danger', TRANSLATION.error.loadTargets);
             }
+        }
+    };
+
+    const ViewProgressManager = {
+        init() {
+            const self = this;
+            $(document).on('click', '.viewObjectiveProgressBtn', async function() {
+                const id = $(this).data('id');
+                const name = $(this).data('name');
+                
+                $('#progress-objective-name').text(name);
+                $('#progress-table-body').empty();
+                $('#progress-loading-placeholder').removeClass('d-none');
+                $('#progress-empty-placeholder').addClass('d-none');
+                
+                const modal = new bootstrap.Modal(document.getElementById('objectiveProgressModal'));
+                modal.show();
+                
+                try {
+                    const data = await ApiManager.fetchProgress(id);
+                    self.render(data);
+                } catch (error) {
+                    Utils.showAlert('danger', 'Unable to load progress data.');
+                    modal.hide();
+                } finally {
+                    $('#progress-loading-placeholder').addClass('d-none');
+                }
+            });
+        },
+        
+        render(data) {
+            const $body = $('#progress-table-body');
+            $body.empty();
+            
+            if (!data || data.length === 0) {
+                $('#progress-empty-placeholder').removeClass('d-none');
+                return;
+            }
+            
+            data.forEach(item => {
+                let badgeColor = 'secondary';
+                if (item.status_raw === 'completed') badgeColor = 'success';
+                if (item.status_raw === 'in_progress') badgeColor = 'info';
+                
+                const row = `
+                    <tr>
+                        <td class="px-4 py-3 fw-bold text-dark">${item.employee_name}</td>
+                        <td><span class="badge bg-${badgeColor}">${item.status}</span></td>
+                        <td><div class="text-wrap" style="max-width: 300px;">${item.notes}</div></td>
+                        <td class="px-4 py-3 text-end text-muted small">${item.completed_at}</td>
+                    </tr>
+                `;
+                $body.append(row);
+            });
         }
     };
 
@@ -306,17 +374,9 @@ export function initEducationalObjectivesPage() {
             
             $('#form-objective-scope-type').on('change', function() {
                 const type = $(this).val();
-                if (type === 'company' || type === 'individual') {
+                if (type === 'company') {
                     $('#scope-id-container').addClass('d-none');
                     $('#form-objective-scope-id').val('').trigger('change.select2');
-                    
-                    if (type === 'individual') {
-                         $('#form-objective-scope-id').empty();
-                         // In reality, individual should fetch users, but since scope_id is nullable 
-                         // and MVP assumes direct ID, we can do a standard text input if needed or select.
-                         // Keeping it simple: individual without ID handles via custom input if needed.
-                         // But we didn't add user fetching. Let's hide it for now, and individual defaults.
-                    }
                 } else {
                     $('#scope-id-container').removeClass('d-none');
                     OptionsManager.loadScopeTargets(type);
@@ -405,6 +465,7 @@ export function initEducationalObjectivesPage() {
             FilterManager.init();
             ModalFlowManager.initLifecycleEvents();
             DeleteManager.init();
+            ViewProgressManager.init();
             FormSubmissionManager.init();
         },
 

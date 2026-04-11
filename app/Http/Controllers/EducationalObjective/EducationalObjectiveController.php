@@ -154,4 +154,15 @@ class EducationalObjectiveController extends Controller
             return $this->reportError($e, 'Unable to mark objective as completed');
         }
     }
+    public function progress(int $id)
+    {
+        try {
+            return $this->apiResponse(
+                data: $this->objectiveService->getProgress($id),
+                message: 'Objective progress fetched successfully.',
+            );
+        } catch (Throwable $e) {
+            return $this->reportError($e, 'Unable to fetch objective progress');
+        }
+    }
 }

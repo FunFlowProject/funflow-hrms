@@ -196,6 +196,24 @@ class EducationalObjectiveService
     }
 
     /**
+     * Get detailed progress for an objective.
+     */
+    public function getProgress(int $id): array
+    {
+        $objective = EducationalObjective::with('employees')->findOrFail($id);
+        
+        return $objective->employees->map(function ($user) {
+            return [
+                'employee_name' => $user->full_name,
+                'status' => $user->pivot->status->label(),
+                'status_raw' => $user->pivot->status->value,
+                'notes' => $user->pivot->progress_notes ?? '-',
+                'completed_at' => $user->pivot->completed_at ? $user->pivot->completed_at->format('M d, Y H:i') : '-',
+            ];
+        })->toArray();
+    }
+
+    /**
      * Delete an objective.
      */
     public function destroy(int $id): bool
@@ -220,6 +238,16 @@ class EducationalObjectiveService
     protected function renderActionButtons(EducationalObjective $objective): string
     {
         $actions = [
+            [
+                'label' => 'View Progress',
+                'class' => 'text-primary viewObjectiveProgressBtn',
+                'icon' => 'bx bx-show',
+                'modal' => true,
+                'data' => [
+                    'id' => $objective->id,
+                    'name' => $objective->name,
+                ]
+            ],
             [
                 'label' => 'Delete Objective',
                 'class' => 'text-danger deleteObjectiveBtn',

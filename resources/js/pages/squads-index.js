@@ -509,7 +509,7 @@ export function initSquadsPage() {
     const SquadApp = {
         initPlugins() {
             Utils.initSelect2('.select2-filter');
-            Utils.initSelect2('.select2-init', $('#employeeFormModal'));
+            Utils.initSelect2('.select2-init', $('#squadFormModal'));
         },
 
         initEvents() {

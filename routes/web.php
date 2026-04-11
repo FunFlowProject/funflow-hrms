@@ -185,8 +185,10 @@ Route::middleware('auth')->group(function () {
             Route::get('/stats', [EducationalObjectiveController::class, 'stats'])->name('stats');
             Route::get('/datatable', [EducationalObjectiveController::class, 'datatable'])->name('datatable');
             Route::post('/', [EducationalObjectiveController::class, 'store'])->name('store');
+            Route::get('/{objective}/progress', [EducationalObjectiveController::class, 'progress'])->name('progress');
             Route::delete('/{objective}', [EducationalObjectiveController::class, 'destroy'])->name('destroy');
         });
+        Route::get('/employees-all', [\App\Http\Controllers\Employee\EmployeeController::class, 'active'])->name('employees-all');
     });
 
     Route::prefix('my-educational-objectives')->name('my-objectives.')->group(function () {

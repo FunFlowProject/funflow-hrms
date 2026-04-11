@@ -4,7 +4,8 @@
         data-sub-companies-all-url="{{ route('sub-companies.all') }}"
         data-squads-all-url="{{ route('squads.all') }}"
         data-stats-url="{{ route('educational-objectives.stats') }}"
-        data-datatable-url="{{ route('educational-objectives.datatable') }}">
+        data-datatable-url="{{ route('educational-objectives.datatable') }}"
+        data-employees-all-url="{{ route('educational-objectives.employees-all') }}">
 
         <x-ui.page-header title="Learning & Development"
             description="Manage, assign, and track employee educational objectives.">
@@ -113,6 +114,7 @@
         </x-ui.data-table-card>
 
         <x-educational-objectives.form-modal />
+        <x-educational-objectives.progress-modal />
 
     </div>
 </x-layouts.app>
