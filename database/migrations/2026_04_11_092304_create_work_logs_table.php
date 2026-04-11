@@ -16,8 +16,6 @@ return new class extends Migration {
             $table->json('tasks');
             $table->integer('total_duration_minutes')->default(0);
             $table->timestamps();
-
-            $table->index(['user_id', 'log_date']);
         });
     }
 
