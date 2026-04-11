@@ -3,40 +3,41 @@
 namespace App\Observers;
 
 use App\Models\User;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 class UserObserver
 {
     /**
-     * Handle the User "creating" event.
+     * Handle the User "created" event.
      */
-    public function creating(User $user): void
+    public function created(User $user): void
     {
         if (blank($user->username)) {
-            $user->username = $this->generateUniqueUsername($user);
+            $user->username = $this->generateUsernameFromId($user);
+            $user->saveQuietly();
         }
     }
 
     /**
-     * Generate a unique username based on full name and hire date.
+     * Generate a username based on first name initial, last name, and the generated ID.
      */
-    private function generateUniqueUsername(User $user): string
+    private function generateUsernameFromId(User $user): string
     {
-        $base = Str::slug((string) $user->full_name, '.') ?: 'employee';
+        $nameParts = array_values(array_filter(preg_split('/\s+/', trim((string) $user->full_name))));
 
-        $year = $user->hire_date 
-            ? Carbon::parse($user->hire_date)->format('Y') 
-            : now()->format('Y');
+        $firstInitial = '';
+        $lastName = 'employee';
 
-        $candidate = "{$base}.{$year}";
-        $suffix = 1;
-
-        while (User::query()->where('username', $candidate)->exists()) {
-            $candidate = "{$base}.{$year}.{$suffix}";
-            $suffix++;
+        if (!empty($nameParts)) {
+            $firstInitial = mb_substr(mb_strtolower($nameParts[0]), 0, 1);
+            $lastName = mb_strtolower($nameParts[count($nameParts) - 1]);
         }
 
-        return $candidate;
+        $base = Str::of($firstInitial . $lastName)
+            ->ascii()
+            ->replaceMatches('/[^a-z0-9]+/', '')
+            ->whenEmpty(fn () => 'employee');
+
+        return (string) $base . $user->id;
     }
 }
