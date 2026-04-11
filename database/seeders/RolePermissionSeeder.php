@@ -72,6 +72,13 @@ class RolePermissionSeeder extends Seeder
             'educational-objectives.view',
         ];
 
+        $workLogPermissions = [
+            'work-logs.my.view',
+            'work-logs.my.create',
+            'work-logs.view-all',
+            'work-logs.manage',
+        ];
+
         $permissions = array_values(array_unique(array_merge(
             $employeePermissions,
             $subCompanyPermissions,
@@ -80,6 +87,7 @@ class RolePermissionSeeder extends Seeder
             $serviceRequestPermissions,
             $documentPermissions,
             $educationalPermissions,
+            $workLogPermissions,
         )));
 
         foreach ($permissions as $permissionName) {
@@ -116,12 +124,18 @@ class RolePermissionSeeder extends Seeder
                 'documents.update',
                 'documents.destroy',
                 'educational-objectives.manage-all', // HR can manage all
+                'work-logs.my.view',
+                'work-logs.my.create',
+                'work-logs.view-all',
+                'work-logs.manage',
             ], fn($p) => !str_ends_with($p, '.my.view'))),
             'employee' => [
                 'service-requests.view',
                 'documents.my.view',
                 'educational-objectives.my.view',
                 'educational-objectives.view',
+                'work-logs.my.view',
+                'work-logs.my.create',
             ],
         ];
 

@@ -20,6 +20,24 @@
             </a>
         </li>
 
+        @can('work-logs.my.view')
+            <li class="menu-item {{ request()->routeIs('my-work-logs.*') ? 'active' : '' }}">
+                <a href="{{ route('my-work-logs.index') }}" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-calendar-check"></i>
+                    <div>My Work Logs</div>
+                </a>
+            </li>
+        @endcan
+
+        @can('work-logs.view-all')
+            <li class="menu-item {{ request()->routeIs('work-logs.*') ? 'active' : '' }}">
+                <a href="{{ route('work-logs.index') }}" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-time-five"></i>
+                    <div>Work Logs</div>
+                </a>
+            </li>
+        @endcan
+
         <li class="menu-item">
             <a href="https://funflow.org/emp-email-login" target="_blank" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-envelope"></i>

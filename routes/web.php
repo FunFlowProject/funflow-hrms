@@ -190,6 +190,19 @@ Route::middleware('auth')->group(function () {
         });
     });
 
+    Route::get('/my-work-logs', [\App\Http\Controllers\WorkLog\WorkLogController::class, 'myIndex'])
+        ->middleware('permission:work-logs.my.view')
+        ->name('my-work-logs.index');
+
+    Route::prefix('work-logs')->name('work-logs.')->middleware('permission:work-logs.view-all')->group(function () {
+        Route::get('/', [\App\Http\Controllers\WorkLog\WorkLogController::class, 'index'])->name('index');
+        Route::get('/datatable', [\App\Http\Controllers\WorkLog\WorkLogController::class, 'datatable'])->name('datatable');
+        Route::get('/{workLog}', [\App\Http\Controllers\WorkLog\WorkLogController::class, 'show'])->name('show');
+        Route::post('/', [\App\Http\Controllers\WorkLog\WorkLogController::class, 'store'])->name('store');
+        Route::put('/{workLog}', [\App\Http\Controllers\WorkLog\WorkLogController::class, 'update'])->name('update');
+        Route::delete('/{workLog}', [\App\Http\Controllers\WorkLog\WorkLogController::class, 'destroy'])->name('destroy');
+    });
+
     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
 });
 

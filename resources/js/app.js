@@ -21,6 +21,7 @@ import { initDocumentsPage } from './pages/documents-index';
 import { initMyDocumentsPage } from './pages/documents-my-documents';
 import { initEducationalObjectivesPage } from './pages/educational-objectives-index';
 import { initMyObjectivesPage } from './pages/educational-objectives-my';
+import { initWorkLogsPage } from './pages/work-logs-index';
 
 window.bootstrap = bootstrap;
 window.$ = $;
@@ -47,4 +48,5 @@ document.addEventListener('DOMContentLoaded', () => {
     initMyDocumentsPage();
     initEducationalObjectivesPage();
     initMyObjectivesPage();
+    initWorkLogsPage();
 });
