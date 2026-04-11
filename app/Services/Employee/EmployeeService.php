@@ -223,7 +223,7 @@ class EmployeeService
         $plainPassword = Str::password(14);
 
         $user = DB::transaction(function () use ($data, $contractType, $status, $systemRole, $creationNote, $plainPassword): User {
-            $nextId = max(1000, User::max('id') ?? 0) + 1;
+            $nextId = \App\Services\SequenceService::nextValue('user_id', 1000);
             $username = $data['username'] ?? $this->generateUsername($data['full_name'] ?? $data['name'], $nextId);
 
             $created = User::query()->create([
@@ -679,7 +679,7 @@ class EmployeeService
             ->whenEmpty(fn () => 'employee');
 
         // Estimate next ID
-        $nextId = $forceNextId ?? (max(1000, User::max('id') ?? 0) + 1);
+        $nextId = $forceNextId ?? \App\Services\SequenceService::nextValue('user_id', 1000);
 
         $username = (string) $base . $nextId;
 
