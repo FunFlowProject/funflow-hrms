@@ -213,8 +213,13 @@ class EmployeeService
 
         $contractType = ContractType::safeFrom($data['contract_type'] ?? null) ?? ContractType::FullTime;
         $systemRole = SystemRole::safeFrom($data['system_role'] ?? null) ?? SystemRole::Employee;
-        $status = EmployeeStatus::Pending;
-        $creationNote = 'Initial employment status assigned during employee creation.';
+
+        // Admin and HR users join directly; employees go through the approval pipeline.
+        $isPrivilegedRole = in_array($systemRole, [SystemRole::Admin, SystemRole::Hr], true);
+        $status = $isPrivilegedRole ? EmployeeStatus::Joined : EmployeeStatus::Pending;
+        $creationNote = $isPrivilegedRole
+            ? 'Automatically joined as a privileged role (' . $systemRole->value . ').'
+            : 'Initial employment status assigned during employee creation.';
         $plainPassword = Str::password(14);
 
         $user = DB::transaction(function () use ($data, $contractType, $status, $systemRole, $creationNote, $plainPassword): User {
