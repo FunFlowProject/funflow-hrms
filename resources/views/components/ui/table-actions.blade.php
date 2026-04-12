@@ -19,7 +19,7 @@
     @if ($canRenderDropdown)
         <div class="btn-group">
             <button type="button" class="btn btn-primary btn-icon rounded-pill dropdown-toggle hide-arrow"
-                data-bs-toggle="dropdown" data-bs-popper-config='{"strategy":"fixed"}' data-bs-placement="bottom-end" data-bs-boundary="viewport" aria-expanded="false"
+                data-bs-toggle="dropdown" data-bs-popper-config='{"strategy":"fixed","placement":"top-start"}' aria-expanded="false"
                 aria-label="Actions" title="Actions">
                 <i class="bx bx-dots-vertical-rounded"></i>
             </button>
