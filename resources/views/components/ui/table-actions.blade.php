@@ -9,7 +9,7 @@
 ])
 
 @php
-    $normalizedActions = array_values(array_unique(array_filter($actions)));
+    $normalizedActions = array_values(array_filter($actions));
     $typeSuffix = trim((string) $type) !== '' ? trim((string) $type) : 'Entity';
     $canRenderDropdown = in_array($mode, ['dropdown', 'both'], true);
     $canRenderSingle = in_array($mode, ['single', 'both'], true);
