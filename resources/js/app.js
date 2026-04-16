@@ -15,6 +15,8 @@ import { initHrDashboardPage } from './pages/hr-dashboard';
 import { initEmployeesPage } from './pages/employees-index';
 import { initServiceCatalogPage } from './pages/service-catalog-index';
 import { initServiceRequestsPage } from './pages/service-requests-index';
+import { initProfitPage } from './pages/profit-index';
+import { initMyProfitPage } from './pages/profit-my';
 import { initSubCompaniesPage } from './pages/sub-companies-index';
 import { initSquadsPage } from './pages/squads-index';
 import { initDocumentsPage } from './pages/documents-index';
@@ -44,6 +46,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initSquadsPage();
     initServiceCatalogPage();
     initServiceRequestsPage();
+    initProfitPage();
+    initMyProfitPage();
     initDocumentsPage();
     initMyDocumentsPage();
     initEducationalObjectivesPage();

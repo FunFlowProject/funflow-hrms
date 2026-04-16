@@ -109,6 +109,28 @@
             </li>
         @endcan
 
+            @canany(['profit.view', 'profit.my.view'])
+                <li class="menu-header small text-uppercase">
+                    <span class="menu-header-text">Finance</span>
+                </li>
+
+                @can('profit.view')
+                    <li class="menu-item {{ request()->routeIs('profit.*') ? 'active' : '' }}">
+                        <a href="{{ route('profit.index') }}" class="menu-link">
+                            <i class="menu-icon tf-icons bx bx-coin-stack"></i>
+                            <div>Profit</div>
+                        </a>
+                    </li>
+                @elsecan('profit.my.view')
+                    <li class="menu-item {{ request()->routeIs('my-profit.*') ? 'active' : '' }}">
+                        <a href="{{ route('my-profit.index') }}" class="menu-link">
+                            <i class="menu-icon tf-icons bx bx-wallet"></i>
+                            <div>My Profit</div>
+                        </a>
+                    </li>
+                @endcan
+            @endcanany
+
         <li class="menu-header small text-uppercase">
             <span class="menu-header-text">Documents</span>
         </li>

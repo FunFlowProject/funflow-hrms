@@ -57,6 +57,14 @@ class RolePermissionSeeder extends Seeder
             'service-requests.transition',
         ];
 
+        $profitPermissions = [
+            'profit.view',
+            'profit.distribute',
+            'profit.manage-withdrawals',
+            'profit.my.view',
+            'profit.my.withdraw',
+        ];
+
         $documentPermissions = [
             'documents.view',
             'documents.my.view',
@@ -85,6 +93,7 @@ class RolePermissionSeeder extends Seeder
             $squadPermissions,
             $serviceCatalogPermissions,
             $serviceRequestPermissions,
+            $profitPermissions,
             $documentPermissions,
             $educationalPermissions,
             $workLogPermissions,
@@ -103,7 +112,7 @@ class RolePermissionSeeder extends Seeder
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         $rolePermissions = [
-            'admin' => array_values(array_filter($permissions, fn($p) => !str_ends_with($p, '.my.view'))),
+            'admin' => array_values(array_filter($permissions, fn($p) => !str_contains($p, '.my.'))),
             'hr' => array_values(array_filter([
                 'employees.view',
                 'employees.create',
@@ -139,6 +148,8 @@ class RolePermissionSeeder extends Seeder
                 'educational-objectives.view',
                 'work-logs.my.view',
                 'work-logs.my.create',
+                'profit.my.view',
+                'profit.my.withdraw',
             ],
         ];
 

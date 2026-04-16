@@ -9,6 +9,8 @@ use App\Http\Controllers\Organization\SquadController;
 use App\Http\Controllers\Organization\SubCompanyController;
 use App\Http\Controllers\ServiceRequest\ServiceCatalogController;
 use App\Http\Controllers\ServiceRequest\ServiceRequestController;
+use App\Http\Controllers\Profit\MyProfitController;
+use App\Http\Controllers\Profit\ProfitController;
 use App\Http\Controllers\Document\DocumentController;
 use App\Http\Controllers\EducationalObjective\EducationalObjectiveController;
 use Illuminate\Support\Facades\Route;
@@ -146,6 +148,48 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [ServiceRequestController::class, 'employeeIndex'])
             ->middleware('permission:service-requests.view')
             ->name('index');
+    });
+
+    Route::prefix('profit')->name('profit.')->group(function () {
+        Route::get('/', [ProfitController::class, 'index'])
+            ->middleware('permission:profit.view')
+            ->name('index');
+
+        Route::get('/options', [ProfitController::class, 'options'])
+            ->middleware('permission:profit.view')
+            ->name('options');
+
+        Route::get('/employees', [ProfitController::class, 'employees'])
+            ->middleware('permission:profit.view')
+            ->name('employees');
+
+        Route::get('/withdrawal-requests', [ProfitController::class, 'withdrawalRequests'])
+            ->middleware('permission:profit.view|profit.manage-withdrawals')
+            ->name('withdrawal-requests');
+
+        Route::post('/distribute', [ProfitController::class, 'distribute'])
+            ->middleware('permission:profit.distribute')
+            ->name('distribute');
+
+        Route::post('/withdrawal-requests/{id}/approve', [ProfitController::class, 'approveWithdrawal'])
+            ->middleware('permission:profit.manage-withdrawals')
+            ->name('withdrawal-requests.approve');
+
+        Route::post('/withdrawal-requests/{id}/reject', [ProfitController::class, 'rejectWithdrawal'])
+            ->middleware('permission:profit.manage-withdrawals')
+            ->name('withdrawal-requests.reject');
+    });
+
+    Route::prefix('my-profit')->name('my-profit.')->group(function () {
+        Route::middleware('permission:profit.my.view')->group(function () {
+            Route::get('/', [MyProfitController::class, 'index'])->name('index');
+            Route::get('/balance', [MyProfitController::class, 'balance'])->name('balance');
+            Route::get('/transactions', [MyProfitController::class, 'transactions'])->name('transactions');
+            Route::get('/withdrawal-requests', [MyProfitController::class, 'withdrawalRequests'])->name('withdrawal-requests');
+            Route::post('/withdraw', [MyProfitController::class, 'requestWithdrawal'])
+                ->middleware('permission:profit.my.withdraw')
+                ->name('withdraw');
+        });
     });
 
     Route::prefix('documents')->name('documents.')->group(function () {

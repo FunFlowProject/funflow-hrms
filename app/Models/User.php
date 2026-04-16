@@ -10,6 +10,7 @@ use App\Enums\SystemRole;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -133,6 +134,24 @@ class User extends Authenticatable
     public function handledServiceRequests(): HasMany
     {
         return $this->hasMany(ServiceRequest::class, 'handled_by');
+    }
+
+    // Get the current profit balance for the user.
+    public function profitBalance(): HasOne
+    {
+        return $this->hasOne(ProfitBalance::class, 'user_id');
+    }
+
+    // Get profit transactions recorded for the user.
+    public function profitTransactions(): HasMany
+    {
+        return $this->hasMany(ProfitTransaction::class, 'user_id');
+    }
+
+    // Get withdrawal requests submitted by the user.
+    public function withdrawalRequests(): HasMany
+    {
+        return $this->hasMany(WithdrawalRequest::class, 'user_id');
     }
 
     // Get documents acknowledged or viewed by the user.
