@@ -5,7 +5,8 @@
         data-squads-all-url="{{ route('squads.all') }}"
         data-stats-url="{{ route('educational-objectives.stats') }}"
         data-datatable-url="{{ route('educational-objectives.datatable') }}"
-        data-employees-all-url="{{ route('educational-objectives.employees-all') }}">
+        data-employees-all-url="{{ route('educational-objectives.employees-all') }}"
+        data-progress-url-template="{{ route('educational-objectives.progress', ['objective' => '__id__']) }}">
 
         <x-ui.page-header title="Learning & Development"
             description="Manage, assign, and track employee educational objectives.">

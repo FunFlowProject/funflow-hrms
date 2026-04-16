@@ -22,6 +22,7 @@ export function initEducationalObjectivesPage() {
             subCompaniesAll: 'subCompaniesAllUrl',
             squadsAll: 'squadsAllUrl',
             employeesAll: 'employeesAllUrl',
+            progress: 'progressUrlTemplate',
         }),
     };
 
