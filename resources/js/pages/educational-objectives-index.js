@@ -81,10 +81,10 @@ export function initEducationalObjectivesPage() {
                 ROUTES.objectives.datatable,
                 [
                     { data: 'name', name: 'name' },
-                    { 
-                        data: 'priority', 
+                    {
+                        data: 'priority',
                         name: 'priority',
-                        render: function(data) {
+                        render: function (data) {
                             let color = 'secondary';
                             if (data === 'High') color = 'danger';
                             if (data === 'Medium') color = 'warning';
@@ -136,12 +136,12 @@ export function initEducationalObjectivesPage() {
             const response = await $.get(ROUTES.objectives.squadsAll);
             return response?.data ?? [];
         },
-        
+
         async fetchEmployees() {
             const response = await $.get(ROUTES.objectives.employeesAll);
             return response?.data ?? [];
         },
-        
+
         async fetchProgress(id) {
             const response = await $.get(ROUTES.objectives.progress(id));
             return response?.data ?? [];
@@ -205,7 +205,7 @@ export function initEducationalObjectivesPage() {
             const $scopeIdSelect = $('#form-objective-scope-id');
             const $notice = $('#manager-squad-notice');
             $scopeIdSelect.empty().append('<option value=""></option>');
-            
+
             if (scopeType === 'company') {
                 return;
             }
@@ -213,7 +213,7 @@ export function initEducationalObjectivesPage() {
             try {
                 let data = [];
                 let defaultText = '';
-                
+
                 if (scopeType === 'sub_company') {
                     data = await ApiManager.fetchSubCompanies();
                     defaultText = TRANSLATION.options.subCompany;
@@ -245,22 +245,23 @@ export function initEducationalObjectivesPage() {
     const ViewProgressManager = {
         init() {
             const self = this;
-            $(document).on('click', '.viewObjectiveProgressBtn', async function() {
+            $(document).on('click', '.viewObjectiveProgressBtn', async function () {
                 const id = $(this).data('id');
                 const name = $(this).data('name');
-                
+
                 $('#progress-objective-name').text(name);
                 $('#progress-table-body').empty();
                 $('#progress-loading-placeholder').removeClass('d-none');
                 $('#progress-empty-placeholder').addClass('d-none');
-                
+
                 const modal = new bootstrap.Modal(document.getElementById('objectiveProgressModal'));
                 modal.show();
-                
+
                 try {
                     const data = await ApiManager.fetchProgress(id);
                     self.render(data);
                 } catch (error) {
+                    console.error('Error loading progress data:', error);
                     Utils.showAlert('danger', 'Unable to load progress data.');
                     modal.hide();
                 } finally {
@@ -268,21 +269,21 @@ export function initEducationalObjectivesPage() {
                 }
             });
         },
-        
+
         render(data) {
             const $body = $('#progress-table-body');
             $body.empty();
-            
+
             if (!data || data.length === 0) {
                 $('#progress-empty-placeholder').removeClass('d-none');
                 return;
             }
-            
+
             data.forEach(item => {
                 let badgeColor = 'secondary';
                 if (item.status_raw === 'completed') badgeColor = 'success';
                 if (item.status_raw === 'in_progress') badgeColor = 'info';
-                
+
                 const row = `
                     <tr>
                         <td class="px-4 py-3 fw-bold text-dark">${item.employee_name}</td>
@@ -301,21 +302,21 @@ export function initEducationalObjectivesPage() {
             DOM.form.reset();
 
             $('#form-objective-priority').val('medium').trigger('change.select2');
-            
+
             // Re-trigger auth defaults if applicable
             const $scopeTypeOpts = $('#form-objective-scope-type option');
             if ($scopeTypeOpts.length > 0) {
-               $('#form-objective-scope-type').val($scopeTypeOpts[0].value).trigger('change.select2');
+                $('#form-objective-scope-type').val($scopeTypeOpts[0].value).trigger('change.select2');
             }
-            
+
             $('#form-objective-upload-type').val('').trigger('change.select2');
-            
+
             Utils.clearSelect2('#form-objective-scope-id');
             $('#scope-id-container').addClass('d-none');
-            
+
             $('#file-upload-container').addClass('d-none');
             $('#file-url-container').addClass('d-none');
-            
+
             Utils.clearFormErrors('#objective-form-errors');
         },
 
@@ -371,8 +372,8 @@ export function initEducationalObjectivesPage() {
                 Utils.clearFormErrors('#objective-form-errors');
                 ScrollManager.destroy(DOM.formModal);
             });
-            
-            $('#form-objective-scope-type').on('change', function() {
+
+            $('#form-objective-scope-type').on('change', function () {
                 const type = $(this).val();
                 if (type === 'company') {
                     $('#scope-id-container').addClass('d-none');
@@ -382,8 +383,8 @@ export function initEducationalObjectivesPage() {
                     OptionsManager.loadScopeTargets(type);
                 }
             });
-            
-            $('#form-objective-upload-type').on('change', function() {
+
+            $('#form-objective-upload-type').on('change', function () {
                 const type = $(this).val();
                 $('#file-upload-container').toggleClass('d-none', type !== 'file');
                 $('#file-url-container').toggleClass('d-none', type !== 'url');
@@ -393,7 +394,7 @@ export function initEducationalObjectivesPage() {
 
     const DeleteManager = {
         init() {
-            $(document).on('click', '.deleteObjectiveBtn', async function() {
+            $(document).on('click', '.deleteObjectiveBtn', async function () {
                 const id = $(this).data('id');
                 const name = $(this).data('name');
 
@@ -422,17 +423,17 @@ export function initEducationalObjectivesPage() {
 
     const FormSubmissionManager = {
         init() {
-            $('#objective-form').on('submit', async function(event) {
+            $('#objective-form').on('submit', async function (event) {
                 event.preventDefault();
 
                 const $submitBtn = Utils.getFormSubmitBtn(this);
-                
+
                 if (!this.checkValidity()) {
                     event.stopPropagation();
                     this.classList.add('was-validated');
                     return;
                 }
-                
+
                 Utils.clearFormErrors('#objective-form-errors');
                 const formData = FormManager.getSubmitPayload();
                 Utils.setBtnLoading($submitBtn, true);
